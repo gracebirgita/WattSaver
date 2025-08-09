@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="..\css\analisis.css">
+    <link rel="stylesheet" href="..\css\edit.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <!-- not login -->
+            <div class="navbar-guest" style="display:none;">
+                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
+                <a href="html\login.html" class="btn-green" id="masuk">Masuk</a>
+            </div>
+            
+            <!-- after login -->
+            <div class="navbar-logged-in">
+                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
+                <div class="nav-links">
+                    <a href="..\index.html" class="active">Beranda</a>
+                    <a href="analisis.html">Analisis</a>
+                    <a href="history.html">Riwayat</a>
+                </div>
+                <a class="btn-green" id="keluar">Keluar</a>
+            </div>
+        </nav>
+        
+        <script src="..\navbar.js"></script>
+    </header>
+
+    <section id="hero-section">
+        <h1>Analisis</h1>
+        <h4>Memantau dan mengoptimalkan konsumsi listrik</h4>
+    </section>
+
+    <!-- edit tambah perangkat -->
+    <div class="container-box"  id="add-device-form">
+        <h3>Tambah Perangkat Anda</h3>
+        <div class="new-device">
+            <!-- device name -->
+            <div class="input-form">
+                <label for="name-device">Nama Perangkat</label>
+                <input type="text" placeholder="kulkas"></input>
+            </div>
+
+            <!-- jumlah device -->
+            <div class="input-form" id="jml">
+                <label for="jml-device">Jumlah</label>
+                <input type="number" class="form-control-counter-input" value="1" min="1">
+            </div>
+
+
+            <!-- tingkat kepentingan -->
+            <div class="input-form" id="jml">
+                <label for="kepentingan">Tingkat Kepentingan</label>
+                <select class="form-select" aria-label="Default select example">
+                    <option selected>Pilih Tingkat Kepentingan</option>
+                    <option value="1">Rendah (optional)</option>
+                    <option value="2">Sedang (Important)</option>
+                    <option value="3">Tinggi (Essential)</option>
+                </select>
+            </div>
+
+
+            <!-- daya -->
+            <div class="input-form">
+                <label for="daya">Daya (Watt/Unit)</label>
+                <input type="number" placeholder="100"></input>
+            </div>
+
+            <!-- jam penggunaan -->
+            <div class="input-form">
+                <label for="time-use">Jam pernggunaan (per hari)</label>
+                <input type="number" placeholder="3"></input>
+            </div>
+
+            <!-- delete device -->
+            <button id="delete-device-btn" class="btn-red">Hapus</button>
+        </div>
+
+        <!-- update device -->
+        <button id="update-device-btn" class="btn-yellow">Perbarui Data</button>
+    </div>
+
+    <!-- footer -->
+    <div style="height: 10rem;"></div>
+    <footer id="footer">
+        <h1>WattSaver</h1>
+        <hr>
+        <ul class="list">
+                <a href="#beranda">Beranda</a>
+            <li>
+                <a href="#analisis">Analisis</a>
+            </li>
+            <li>
+                <a href="#riwayat">Riwayat</a>
+            </li>
+            <li>
+                <a href="#">@2025 WattSaver</a>
+            </li>
+        </ul>
+    </footer>
+    
+    <script src="..\scripts\edit.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <!-- not login -->
+            <div class="navbar-guest" style="display:none;">
+                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
+                <a href="html/login.html" class="btn-green" id="masuk">Masuk</a>
+            </div>
+
+            <!-- after login -->
+            <div class="navbar-logged-in">
+                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
+                <div class="nav-links">
+                    <a href="index.html" data-page="beranda" class="active">Beranda</a>
+                    <a href="../html/analisis.html" data-page="analisis">Analisis</a>
+                    <a href="../html/history.html" data-page="history">Riwayat</a>
+                </div>
+                <a class="btn-green" id="keluar">Keluar</a>
+            </div>
+        </nav>
+
+        <script src="navbar.js"></script>
+    </header>
+    
+
+    <section id="coba-sekarang">
+
+        <div class="try-grid-item-1">
+            <h1>Efisiensi energi listrik dan hemat pengeluaran</h1>
+            <p>ingin menjadikan kota lebih baik? Buat perubahan hari ini dengan bergabung bersama kami</p>
+            <a href="html\login.html" class="btn-green" id="try-now">Coba sekarang</a>
+        </div>
+
+        <div class="try-grid-item-2">
+            <img src="assets\green-nobg.png" alt="green-items">
+            <img id="graph" src="assets\graph-electricity-promote.png" alt="graph-consumption">
+        </div>
+
+    </section>
+
+    <div class="blur-bg">
+        <section id="data-problem">
+            <div class="data-explain">
+                <h2>> 13%</h2>
+                <h5>Realisasi konsumsi listrik</h5>
+                <hr>
+                <p>konsumsi listrik pada periode 2023 
+                    mencapai 1.337 kWh/kapita, meningkat 
+                    sebesar 13,98% dari tahun 2022 sebesar
+                    1.173kWh/kapita</p>
+            </div>
+            
+            <div class="data-explain">
+                <h2>12</h2>
+                <h5>Negara<br>paling boros listrik</h5>
+                <hr>
+                <p>Mengurangi konsumsi listrik berarti penurunan 
+                    permintaan energi kota secara keseluruhan</p>
+                </div>
+         </section>
+    </div>
+
+    <section id="benefit">
+        <div class="benefit-item">
+            <div class="benefit-desc">
+                <h1>Efisiensi Energi</h1>
+                <p>Mengurangi permintaan energi listrik kota, berkontribusi dalam 
+                    pengurangan emisi karbon untuk kota pintar lebih 
+                    hijau dan berkelanjutan </p>
+            </div>
+            <img class='img-benefit' src="assets\efisiensi-pict.png" alt="efisiensi-pict">
+        </div>
+
+        <div class="benefit-item">
+            <div div class="benefit-desc">
+                <h1>Disiplin Finansial</h1>
+                <p>Tetapkan target pengeluaran dan meningkatkan 
+                    kebiasaan perencanaan dan disiplin finansial sekaligus energi </p>
+            </div>
+            <img class='img-benefit' src="assets\disiplin-pict.png" alt="efisiensi-pict">
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-desc">
+                <h1>Hemat pengeluran</h1>
+                <p>Hemat uang yang bisa dialokasikan ke kebutuhan lain, 
+                    meningkatkan kualitas hidup dan kebebasan finansial di era urban. 
+                    Dapatkan rekomendasi berbasis AI untuk optimasi penggunaan listrik </p>
+            </div>
+            <img class='img-benefit' src="assets\hemat-pict.png" alt="efisiensi-pict">
+        </div>
+        
+    </section>
+
+    <section id="join-us-section">
+        <h3>Ayo bergabung bersama kami!</h3>
+        <a href="html\login.html" id="join" class='btn-green'>Join</a>
+
+    </section>
+
+
+    <!-- <section id="home">
+        <p>this is HOME</p>
+    </section>
+    <section id="dashboard">
+        <p>this is DASHBOARD</p>
+    </section>
+    <section id="history">
+        <p>this is HISTORY</p>
+    </section> -->
+
+
+    <footer id="footer">
+        <h1>WattSaver</h1>
+        <hr>
+        <ul class="list">
+                <a href="#beranda">Beranda</a>
+            <li>
+                <a href="#analisis">Analisis</a>
+            </li>
+            <li>
+                <a href="#riwayat">Riwayat</a>
+            </li>
+            <li>
+                <a href="#">@2025 WattSaver</a>
+            </li>
+        </ul>
+    </footer>
+</body>
+    <script src="scripts\landingPage.js"></script>
+</html>
