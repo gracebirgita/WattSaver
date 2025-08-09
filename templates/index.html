@@ -5,30 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
     <title>Document</title>
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <!-- not login -->
             <div class="navbar-guest" style="display:none;">
-                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
-                <a href="html/login.html" class="btn-green" id="masuk">Masuk</a>
+                <img src="{{ url_for('static', filename='assets/logo-nobg.png')}}" alt="logo+icon" class="logo">
+                <a href="{{url_for('login')}}" class="btn-green" id="masuk">Masuk</a>
             </div>
 
             <!-- after login -->
             <div class="navbar-logged-in">
-                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
+                <img src="{{ url_for('static', filename='assets/logo-nobg.png')}}" alt="logo+icon" class="logo">
                 <div class="nav-links">
-                    <a href="index.html" data-page="beranda" class="active">Beranda</a>
-                    <a href="../html/analisis.html" data-page="analisis">Analisis</a>
-                    <a href="../html/history.html" data-page="history">Riwayat</a>
+                    <a href="{{url_for('index')}}" data-page="beranda" class="active">Beranda</a>
+                    <a href="{{url_for('analisis')}}" data-page="analisis">Analisis</a>
+                    <a href="{{url_for('history')}}" data-page="history">Riwayat</a>
                 </div>
                 <a class="btn-green" id="keluar">Keluar</a>
             </div>
         </nav>
 
-        <script src="navbar.js"></script>
+        <script src="{{ url_for('static', filename='scripts/navbar.js')}}"></script>
     </header>
     
 
@@ -37,12 +37,12 @@
         <div class="try-grid-item-1">
             <h1>Efisiensi energi listrik dan hemat pengeluaran</h1>
             <p>ingin menjadikan kota lebih baik? Buat perubahan hari ini dengan bergabung bersama kami</p>
-            <a href="html\login.html" class="btn-green" id="try-now">Coba sekarang</a>
+            <a href="{{url_for('login')}}" class="btn-green" id="try-now">Coba sekarang</a>
         </div>
 
         <div class="try-grid-item-2">
-            <img src="assets\green-nobg.png" alt="green-items">
-            <img id="graph" src="assets\graph-electricity-promote.png" alt="graph-consumption">
+            <img src="{{ url_for('static', filename='assets/green-nobg.png')}}" alt="green-items">
+            <img id="graph" src="{{ url_for('static', filename='assets/graph-electricity-promote.png')}}" alt="graph-consumption">
         </div>
 
     </section>
@@ -77,7 +77,7 @@
                     pengurangan emisi karbon untuk kota pintar lebih 
                     hijau dan berkelanjutan </p>
             </div>
-            <img class='img-benefit' src="assets\efisiensi-pict.png" alt="efisiensi-pict">
+            <img class='img-benefit' src="{{ url_for('static', filename='assets/efisiensi-pict.png')}}" alt="efisiensi-pict">
         </div>
 
         <div class="benefit-item">
@@ -86,7 +86,7 @@
                 <p>Tetapkan target pengeluaran dan meningkatkan 
                     kebiasaan perencanaan dan disiplin finansial sekaligus energi </p>
             </div>
-            <img class='img-benefit' src="assets\disiplin-pict.png" alt="efisiensi-pict">
+            <img class='img-benefit' src="{{ url_for('static', filename='assets/disiplin-pict.png')}}" alt="efisiensi-pict">
         </div>
 
         <div class="benefit-item">
@@ -96,14 +96,14 @@
                     meningkatkan kualitas hidup dan kebebasan finansial di era urban. 
                     Dapatkan rekomendasi berbasis AI untuk optimasi penggunaan listrik </p>
             </div>
-            <img class='img-benefit' src="assets\hemat-pict.png" alt="efisiensi-pict">
+            <img class='img-benefit' src="{{ url_for('static', filename='assets/hemat-pict.png')}}" alt="efisiensi-pict">
         </div>
         
     </section>
 
     <section id="join-us-section">
         <h3>Ayo bergabung bersama kami!</h3>
-        <a href="html\login.html" id="join" class='btn-green'>Join</a>
+        <a href="{{url_for('login')}}" id="join" class='btn-green'>Join</a>
 
     </section>
 
@@ -136,5 +136,5 @@
         </ul>
     </footer>
 </body>
-    <script src="scripts\landingPage.js"></script>
+    <script src="{{ url_for('static', filename='scripts/landingPage.js')}}"></script>
 </html>

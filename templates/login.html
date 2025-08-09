@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css')}}">
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
 </head>
 <body>
@@ -24,12 +24,12 @@
             </div>
 
             <button id="login" type="submit" class="btn-green">Masuk</button>
-            <p>Tidak punya akun? <a href="register.html">Daftar</a></p>
+            <p>Tidak punya akun? <a href="{{url_for('register')}}">Daftar</a></p>
         </div>
         <!-- <a href="" class="btn-green">ini btn-green</a> -->
     </div>
     <div class="icon-lamp">
-        <img src="../assets/icon-lamp-nobg.png" alt="no-lamp-logo">
+        <img src="{{ url_for('static', filename='assets/icon-lamp-nobg.png')}}" alt="no-lamp-logo">
         <h1>WattSaver</h1>
     </div>
 </body>

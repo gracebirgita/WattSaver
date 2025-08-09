@@ -4,31 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="..\css\analisis.css">
-    <link rel="stylesheet" href="..\css\edit.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/analisis.css')}}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/edit.css')}}">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <!-- not login -->
             <div class="navbar-guest" style="display:none;">
-                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
-                <a href="html\login.html" class="btn-green" id="masuk">Masuk</a>
+                <img src="{{ url_for('static', filename='assets/logo-nobg.png')}}" alt="logo+icon" class="logo">
+                <a href="{{url_for('login')}}" class="btn-green" id="masuk">Masuk</a>
             </div>
-            
+
             <!-- after login -->
             <div class="navbar-logged-in">
-                <img src="..\assets\logo-nobg.png" alt="logo+icon" class="logo">
+                <img src="{{ url_for('static', filename='assets/logo-nobg.png')}}" alt="logo+icon" class="logo">
                 <div class="nav-links">
-                    <a href="..\index.html" class="active">Beranda</a>
-                    <a href="analisis.html">Analisis</a>
-                    <a href="history.html">Riwayat</a>
+                    <a href="{{url_for('index')}}" data-page="beranda" class="active">Beranda</a>
+                    <a href="{{url_for('analisis')}}" data-page="analisis">Analisis</a>
+                    <a href="{{url_for('history')}}" data-page="history">Riwayat</a>
                 </div>
                 <a class="btn-green" id="keluar">Keluar</a>
             </div>
         </nav>
-        
-        <script src="..\navbar.js"></script>
+
+        <script src="{{ url_for('static', filename='scripts/navbar.js')}}"></script>
     </header>
 
     <section id="hero-section">
@@ -104,6 +104,6 @@
         </ul>
     </footer>
     
-    <script src="..\scripts\edit.js"></script>
+    <script src="{{ url_for('static', filename='scripts/edit.js')}}"></script>
 </body>
 </html>

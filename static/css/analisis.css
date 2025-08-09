@@ -515,20 +515,24 @@ input:focus{
 /* /////////////////// */
 /* section footer */
 #footer{
+    margin: 0 auto;
     margin-top: auto;
     background-color: var(--light-orange);
     width: 100vw;
     max-width: none;
     position: relative;
+    text-align: center;
+    left: 0;
+    right: 0;
     /* left: 50%;
     margin-left: -50vw; */
 
     padding: 30px;
     min-height: 30vh;
-
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 #footer h1{
     margin: 8px;
