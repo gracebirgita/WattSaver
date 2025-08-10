@@ -9,23 +9,23 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/analisis.css')}}">
 </head>
 <body>
-     <header>
+    <header>
         <nav class="navbar">
             <!-- not login -->
-            <div class="navbar-guest" style="display:none;">
+            <div class="navbar-guest" {% if logged_in%}style="display:none;"{%endif%}>
                 <img src="{{ url_for('static', filename='assets/logo-nobg.png')}}" alt="logo+icon" class="logo">
                 <a href="{{url_for('login')}}" class="btn-green" id="masuk">Masuk</a>
             </div>
 
             <!-- after login -->
-            <div class="navbar-logged-in">
+            <div class="navbar-logged-in" {% if not logged_in%}style="display:none;"{%endif%}>
                 <img src="{{ url_for('static', filename='assets/logo-nobg.png')}}" alt="logo+icon" class="logo">
                 <div class="nav-links">
                     <a href="{{url_for('index')}}" data-page="beranda" class="active">Beranda</a>
                     <a href="{{url_for('analisis')}}" data-page="analisis">Analisis</a>
                     <a href="{{url_for('history')}}" data-page="history">Riwayat</a>
                 </div>
-                <a class="btn-green" id="keluar">Keluar</a>
+                <a class="btn-green" id="keluar" href="{{ url_for('logout')}}">Keluar</a>
             </div>
         </nav>
 

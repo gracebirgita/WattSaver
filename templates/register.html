@@ -8,35 +8,48 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css')}}">
 </head>
 <body>
-    <div class="form-auth">
+
+    <form method="POST" action="{{ url_for('register')}}" class="form-auth">
         <h1>Daftar</h1>
         <div class="in-form">
+
+            {% with messages = get_flashed_messages()%}
+                    {% if messages %}
+                    <div class="flash-warning">
+                        {% for msg in messages %}
+                            <p>{{msg}}</p>
+                        {% endfor %}
+                    </div>
+                    {%endif%}
+            {%endwith%}
 
             <!-- username -->
             <div class="input-regist">
                 <label class="label-auth" for="username">Nama Pengguna</label>
-                <input type="text" placeholder="john_doe"></input>
+                <input name="username" id="username"  type="text" placeholder="john_doe" required></input>
             </div>
             
             <!-- Email -->
             <div class="input-regist">
                 <label class="label-auth" for="username">Email</label>
-                <input type="email" placeholder="@johnD123"></input>
+                <input name="email" id="email"  type="email" placeholder="@johnD123" required></input>
             </div>
 
             <!-- password -->
             <div class="input-regist" id="password">
                 <label class="label-auth" for="passoword">Kata Sandi</label>
-                <input type="text" placeholder="minimal 5 karakter"></input>
+                <input name="password" id="password" type="text" placeholder="minimal 5 karakter" required></input>
             </div>
 
             <!-- sementra nav to dashboard utama -->
             <!-- <button id="register" class="btn-green">Daftar</button> -->
-            <a href="{{ url_for('index')}}"  id="register" class="btn-green" style="text-align: center;">Daftar</a>
+            <!-- <a href="{{ url_for('index')}}"  id="register" class="btn-green" style="text-align: center;">Daftar</a> -->
+            <button id="register" type="submit" class="btn-green">Daftar</button>
             <p>Sudah punya akun? <a href="{{url_for('login')}}">Masuk</a></p>
         </div>
         <!-- <a href="" class="btn-green">ini btn-green</a> -->
-    </div>
+    </form>
+
     <div class="icon-lamp">
         <img src="{{ url_for('static', filename='assets/icon-lamp-nobg.png')}}" alt="no-lamp-logo">
         <h1>WattSaver</h1>

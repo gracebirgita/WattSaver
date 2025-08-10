@@ -173,6 +173,10 @@ header{
     box-shadow: 1.5px 2px 2px rgb(180, 182, 180);
 }
 
+.navbar .btn-green{
+    border-radius: 6px;
+}
+
 /* /////////////////// */
 /* section judul(hero-section) */
 #hero-section{
@@ -253,6 +257,10 @@ input:focus{
     box-shadow: 0 0 0 3px rgba(38, 88, 83, 0.15);
     background-color: #fafafa;
 }
+.input-form:focus::placeholder{
+    opacity: 0.3;
+}
+
 
 
 #target-form .btn-green{

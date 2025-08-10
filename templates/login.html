@@ -9,25 +9,39 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
 </head>
 <body>
-    <div class="form-auth">
+    <form class="form-auth" method="POST" action="{{ url_for('login')}}">
         <h1>Masuk</h1>
         <div class="in-form">
+            {% with messages = get_flashed_messages()%}
+                    {% if messages %}
+                    <div class="flash-warning">
+                        {% for msg in messages %}
+                            <p>{{msg}}</p>
+                        {% endfor %}
+                    </div>
+                    {%endif%}
+            {%endwith%}
+            <!-- username -->
             <div class="input-login">
                 <label class="label-auth" for="username">Nama Pengguna</label>
-                <input type="text" placeholder="john_doe"></input>
+                <input name="username" id="username"  type="text" placeholder="john_doe" required></input>
             </div>
 
+            <!-- password -->
             <div class="input-login" id="password">
                 <label class="label-auth" for="passoword">Kata Sandi</label>
-                <input type="text" placeholder="minimal 5 karakter"></input>
-                <a href="#">Lupa Password?</a>
+                <input name="password" id="password" type="text" placeholder="minimal 5 karakter" required></input>
+                <!-- <a href="#">Lupa Password?</a> -->
+                 
             </div>
 
             <button id="login" type="submit" class="btn-green">Masuk</button>
             <p>Tidak punya akun? <a href="{{url_for('register')}}">Daftar</a></p>
         </div>
         <!-- <a href="" class="btn-green">ini btn-green</a> -->
-    </div>
+    </form>
+
+
     <div class="icon-lamp">
         <img src="{{ url_for('static', filename='assets/icon-lamp-nobg.png')}}" alt="no-lamp-logo">
         <h1>WattSaver</h1>
