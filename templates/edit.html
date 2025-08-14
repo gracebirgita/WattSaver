@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/analisis.css')}}">
-            <link rel="stylesheet" href="{{ url_for('static', filename='css/edit.css')}}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/edit.css')}}">
 </head>
 <body>
     <header>
@@ -39,17 +40,19 @@
     <!-- edit tambah perangkat -->
     <div class="container-box"  id="add-device-form">
         <h3>Tambah Perangkat Anda</h3>
+    {%if devices%}
+        {% for device in devices %}
         <div class="new-device">
             <!-- device name -->
             <div class="input-form">
                 <label for="name-device">Nama Perangkat</label>
-                <input type="text" placeholder="kulkas"></input>
+                <input type="text" placeholder="kulkas" value="{{device.nama | default(kulkas)}}"></input>
             </div>
 
             <!-- jumlah device -->
             <div class="input-form" id="jml">
                 <label for="jml-device">Jumlah</label>
-                <input type="number" class="form-control-counter-input" value="1" min="1">
+                <input type="number" class="form-control-counter-input" value="{{device.jumlah | default(1)}}" min="1">
             </div>
 
 
@@ -57,10 +60,13 @@
             <div class="input-form" id="jml">
                 <label for="kepentingan">Tingkat Kepentingan</label>
                 <select class="form-select" aria-label="Default select example">
-                    <option selected>Pilih Tingkat Kepentingan</option>
-                    <option value="1">Rendah (optional)</option>
+                    <option selected disabled>Pilih Tingkat Kepentingan</option>
+                    <!-- <option value="1">Rendah (optional)</option>
                     <option value="2">Sedang (Important)</option>
-                    <option value="3">Tinggi (Essential)</option>
+                    <option value="3">Tinggi (Essential)</option> -->
+                    <option value="1" {% if device.kepentingan == 'Rendah' %}selected{% endif %}>Rendah (optional)</option>
+                    <option value="2" {% if device.kepentingan == 'Sedang' %}selected{% endif %}>Sedang (Important)</option>
+                    <option value="3" {% if device.kepentingan == 'Tinggi' %}selected{% endif %}>Tinggi (Essential)</option>
                 </select>
             </div>
 
@@ -68,18 +74,20 @@
             <!-- daya -->
             <div class="input-form">
                 <label for="daya">Daya (Watt/Unit)</label>
-                <input type="number" placeholder="100"></input>
+                <input type="number" placeholder="100" value="{{device.watt | default(100)}}"></input>
             </div>
 
             <!-- jam penggunaan -->
             <div class="input-form">
-                <label for="time-use">Jam pernggunaan (per hari)</label>
-                <input type="number" placeholder="3"></input>
+                <label for="time-use">Jam penggunaan (per hari)</label>
+                <input type="number" placeholder="3" value="{{device.waktu_penggunaan | default(3)}}"></input>
             </div>
 
             <!-- delete device -->
             <button id="delete-device-btn" class="btn-red">Hapus</button>
         </div>
+        {%endfor%}
+    {%endif%}
 
         <!-- update device -->
         <button id="update-device-btn" class="btn-yellow">Perbarui Data</button>

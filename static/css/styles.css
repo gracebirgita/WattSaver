@@ -49,6 +49,9 @@ header{
 }
 
 .navbar{
+    flex-wrap: wrap;
+    justify-content: space-between;
+
     display: flex;
     align-items: center;
     padding: 5px 20px;
@@ -87,6 +90,7 @@ header{
     text-align: center;
     margin-left: auto;
     padding-top: 10px;
+    z-index: 1000;
 }
 
 .navbar-logged-in a{
@@ -100,7 +104,7 @@ header{
     align-items: center;
     justify-content: center;
 }
-  
+
 .navbar-logged-in a:hover{
     color: var(--btn-green);
 }
@@ -110,7 +114,6 @@ header{
     text-underline-offset: 9px;
     text-decoration-thickness: 2px;
 }
-
 
 #keluar{
     color: white;
@@ -146,7 +149,8 @@ header{
 #coba-sekarang{
     padding-top: 6.25rem;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* grid-template-columns: repeat(2, 1fr); */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsif */
     align-items: center;
     min-height: 50vh;
     gap:2rem;
@@ -316,6 +320,11 @@ header{
     line-height: 1.2;
     color: var(--btn-green);
     margin-bottom: 1rem;
+}
+
+img{
+    max-width: 100%; /* <=container */
+    height:auto; /*ratio */
 }
 
 .img-benefit{

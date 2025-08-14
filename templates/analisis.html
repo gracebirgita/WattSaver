@@ -14,7 +14,8 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
 
     <!-- chart.js -->
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
     <header>
@@ -45,48 +46,58 @@
         <h4>Memantau dan mengoptimalkan konsumsi listrik</h4>
     </section>
 
-    <div id="target-form">
+    <form id="target-form" method="POST" action="{{ url_for('get_month_target')}}">
         <h3>Tetapkan Target Bulananmu</h3>
         <div class="input-form">
             <label for="target-pengeluaran">Target Pengeluaran Bulanan(Rp)</label>
-            <input type="text" placeholder="200000"></input>
+            <input name="target-expense" type="number" placeholder="200000" required></input>
         </div>
-
+        
         <div class="input-form">
             <label for="gol-listrik">Golongan Tarif Listrik</label>
-            <select class="form-select" aria-label="Default select example">
-                <option selected>Pilih Golongan</option>
-                <option value="1">R-1/TR : Batas 900 VA-RTM</option>
-                <option value="2">R-1/TR : Batas 1300 VA</option>
-                <option value="3">R-1/TR : Batas 2200 VA</option>
-                <option value="4">R-2/TR : Batas 3500 - 5500 VA</option>
-                <option value="5">R-3/TR, TM : Batas 6600 VA keatas</option>
+            <select name='tarif-group'  class="form-select" aria-label="Default select example" required>
+                <option selected disabled value="">Pilih Golongan</option>
+                <option value="900">R-1/TR : Batas 900 VA-RTM</option>
+                <option value="1300">R-1/TR : Batas 1300 VA</option>
+                <option value="2200">R-1/TR : Batas 2200 VA</option>
+                <option value="3500">R-2/TR : Batas 3500 - 5500 VA</option>
+                <option value="6600">R-3/TR, TM : Batas 6600 VA keatas</option>
             </select>
         </div>
+        {% with messages = get_flashed_messages(category_filter=['target-form'])%}
+            {% if messages %}
+                <div class="flash-warning">
+                    {% for msg in messages %}
+                    <p>{{msg}}</p>
+                    {% endfor %}
+                </div>
+            {%endif%}
+        {%endwith%}
 
         <button class="btn-green" type="submit">Tetapkan Target</button>
-    </div>
+    </form>
     
-    <div class="container-box"  id="add-device-form">
+    <form {% if not target_set  %}style="display: none;"{%endif%}
+    class="container-box"  id="add-device-form" method="POST" action="{{ url_for('add_new_device') }}">
         <h3>Tambah Perangkat Anda</h3>
         <div class="new-device">
             <!-- device name -->
             <div class="input-form">
                 <label for="name-device">Nama Perangkat</label>
-                <input type="text" placeholder="kulkas"></input>
+                <input name="device-name" type="text" placeholder="kulkas" required></input>
             </div>
 
             <!-- jumlah device -->
             <div class="input-form" id="jml">
                 <label for="jml-device">Jumlah</label>
-                <input type="number" class="form-control-counter-input" placeholder="1" min="1">
+                <input name="device-jml" type="number" class="form-control-counter-input" placeholder="1" min="1" required>
             </div>
 
             <!-- tingkat kepentingan -->
             <div class="input-form" id="jml">
                 <label for="kepentingan">Tingkat Kepentingan</label>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>Pilih Tingkat Kepentingan</option>
+                <select name="device-kepentingan" class="form-select" aria-label="Default select example" required>
+                    <option selected disabled>Pilih Tingkat Kepentingan</option>
                     <option value="1">Rendah (optional)</option>
                     <option value="2">Sedang (Important)</option>
                     <option value="3">Tinggi (Essential)</option>
@@ -97,80 +108,89 @@
             <!-- daya -->
             <div class="input-form">
                 <label for="daya">Daya (Watt/Unit)</label>
-                <input type="number" placeholder="100" min="1"></input>
+                <input name="device-watt"  type="number" placeholder="100" min="1" required></input>
             </div>
 
             <!-- jam penggunaan -->
             <div class="input-form">
-                <label for="time-use">Jam pernggunaan (per hari)</label>
-                <input type="number" placeholder="1" min="1"></input>
+                <label for="time-use">Jam penggunaan (per hari)</label>
+                <input name="device-jam"  type="number" placeholder="1" min="1" required></input>
             </div>
         </div>
+
+        {% with messages = get_flashed_messages(category_filter=['add-device-form'])%}
+            {% if messages %}
+                <div class="flash-warning">
+                    {% for msg in messages %}
+                    <p>{{msg}}</p>
+                    {% endfor %}
+                </div>
+            {%endif%}
+        {%endwith%}
         <!-- create device -->
         <button id="add-device-btn" class="btn-yellow">+ Tambah Perangkat</button>
-    </div>
+    </form>
 
     <!-- table devices -->
-    <div class="container-box" id="devices-table">
+    <div class="container-box" id="devices-table" 
+    {% if not target_set %}style="display: none;"{%endif%}>
         <h3>Detail Perangkat</h3>
 
+        <!-- dropdown filter -->
         <div class="table-filter">
-            <button class="dropdown-toggle custom-dropdown-btn" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <button id="filter-status" class="dropdown-toggle custom-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 All Status &nbsp;<i class="bi bi-chevron-down"></i>
-
             </button>
+
             <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="#">Rendah</a></li>
-                <li><a class="dropdown-item" href="#">Sedang</a></li>
-                <li><a class="dropdown-item" href="#">Tinggi</a></li>
+                <li><a class="dropdown-item" href="#" data-filter="all">All Status</a></li>
+                <li><a class="dropdown-item" href="#" data-filter="rendah">Rendah</a></li>
+                <li><a class="dropdown-item" href="#" data-filter="sedang">Sedang</a></li>
+                <li><a class="dropdown-item" href="#" data-filter="tinggi">Tinggi</a></li>
             </ul>
         </div>
 
         <!-- read input device -->
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead>
+                <thead>                    
                     <tr>
-                    <th scope="col">Nama</th>
-                    <th scope="col">Jumlah</th>
-                    <th scope="col">Total (kWh)</th>
-                    <th scope="col">Total Biaya (Rp)</th>
-                    <th scope="col">Kepentingan</th>
-                    <th scope="col">Status</th>
+                        <th scope="col">Nama</th>
+                        <th scope="col">Jumlah</th>
+                        <th scope="col">Total (kWh)</th>
+                        <th scope="col">Total Biaya (Rp)</th>
+                        <th scope="col">Kepentingan</th>
+                        <th scope="col">Status</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for device in devices %}
                     <tr>
+                        <th scope="row">{{ device.nama}}</th>
+                        <td>{{ device.jumlah }}</td>
+                        <td>{{ device.total_kWh }}</td>
+                        <td>{{ device.total_biaya }}</td>
+                        <td>{{ device.kepentingan }}</td>
+                        <td class="status">{{ device.status }}</td>
+                    </tr>
+                    {%endfor%}
+                    <!-- <tr>
                         <th scope="row">kulkas</th>
                         <td>2</td>
                         <td>8</td>
                         <td>12.789</td>
                         <td>Tinggi</td>
                         <td>Rendah</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">kulkas</th>
-                        <td>2</td>
-                        <td>8</td>
-                        <td>12.789</td>
-                        <td>Tinggi</td>
-                        <td>Rendah</td>
-                    </tr>
-                        <th scope="row">kulkas</th>
-                        <td>2</td>
-                        <td>8</td>
-                        <td>12.789</td>
-                        <td>Tinggi</td>
-                        <td>Rendah</td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
         </div>
 
         <div class="button-group">
-            <a class="btn-yellow" id="edit-btn" href="{{url_for('edit')}}" data-page="analisis">Edit</a>
+            <a class="btn-yellow" id="edit-btn" href="{{url_for('edit', from_page='analisis')}}" data-page="analisis">Edit</a>
             <button id='analisis-btn' class="btn-green" onClick="">Analisis</button>
         </div>
+
     </div>
 
     <!-- muncul setelah click analisis -->
@@ -182,64 +202,90 @@
             <!-- grid 3 col -->
             <div class="analyze-result" id="konsumsi-listrik">
                 <label for="konsumsi">Konsumsi Per Bulan</label>
-                <h3>40000.00 kWh</h3>
+                <h3>{{listrik_perbulan}} kWh</h3>
             </div>
             <div class="analyze-result" id="biaya">
                 <label for="biaya-label">Estimasi Biaya</label>
-                <h3>Rp 7.000.000</h3>
+                <h3>Rp {{biaya_tagihan}}</h3>
             </div>
             <div class="analyze-result" id="prediction">
-                <label for="biaya-label">Target: 5.200.000</label>
-                <h3 id="predict-category">Hemat</h3>
+                <label for="biaya-label" style="color: black;">Target: Rp {{target_pemakaian}}</label>
+                <h3 id="predict-category">{{label_target}}</h3>
             </div>
         </div>
         
         <!-- chart by kepentingan alat/ status(tingkat keborosan) -->
         <div class="container-box" id="visualisasi-biaya">
-            <h3>Visualisasi Biaya</h3>
-            <canvas id="status-chart"></canvas>
+            <h3>Status Watt Alat</h3>
+            <canvas width="500" height="500"  id="status-chart"></canvas>
         </div>
 
 
     </div>
+    <script>
+        const statusCounts={{status_count|tojson}};
+    </script>
+    <!-- <script src="{{ url_for('static', filename='scripts/analisis.js') }}"></script> -->
     
     <!-- REKOMENDASI -->
     <div id='recommendation' class="container-box" style="display: none;">
         <h3>Rekomendasi</h3>
-
-        <div id="rec-container">
-            <!-- make grid 2 col -->
-            <div class="rec-device">
-                <h3>AC</h3>
+        {% if rekomendasi_optimasi =="not" %}
+            <h5>Pengeluaran listrik Anda [Rp {{biaya_tagihan}}] aman dibawah target [Rp {{target_pemakaian}}].
+                Pertahankan kebiasaan untuk tagihan yang lebih ringan di akhir periode.
+            </h5>
+            <h6>
+                Tips :
+                <br>
+                <br>
                 <ul>
-                    <li>-8 jam penggunaan 1 AC</li>
-                    <li>-4 jam penggunaan 2 AC</li>
+                    <li>Matikan lampu jika tidak digunakan: jadikan kebiasaan untuk selalu mematikan lampu setiap kali meninggalkan ruangan</li>
+                    <li>Cabut charger laptop, ponsel, dan peralatan lain jika sudah tidak digunakan.</li>
+                    <li>Hindari menggunakan peralatan berdaya besar (seperti setrika, pompa air, atau water heater) pada jam beban puncak</li>
                 </ul>
-            
-                <table id="recommend" class="table">
-                    <thead>
-                        <tr>
-                        <th scope="col">- Jam</th>
-                        <th scope="col">Jumlah</th>
-                        <th scope="col">Biaya dihemat</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                    </tbody>
-                </table>
+            </h6>
+            <div class="center-image">
+                <img src="{{url_for('static', filename='assets/house-nobg.png')}}" alt="green-item" width="800rem" style="margin: 3rem; opacity: 0.5;">
             </div>
+        {% else %}
+            <h5></h5>
+            <div id="rec-container">
+            {% if rekomendasi_optimasi %}
+                {% for hasil in rekomendasi_optimasi %}            
+                <!-- make grid 2 col -->
+                <div class="rec-device">
+                <!-- <h3>AC</h3> -->
+                        <h3>{{hasil.nama}}</h3>
+                        <ul>
+                            <li>-{{hasil.pengurangan_jam}} jam penggunaan {{hasil.jumlah_alat}} {{hasil.nama}}</li>
+                            <!-- <li>-4 jam penggunaan 2 AC</li> -->
+                        </ul>
+                    
+                        <table id="recommend" class="table">
+                            <thead>
+                                <tr>
+                                <th scope="col">- Jam/hari</th>
+                                <th scope="col">Jumlah Alat</th>
+                                <th scope="col">Biaya Dihemat(Rp)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">{{hasil.pengurangan_jam }}</th>
+                                    <td>{{hasil.jumlah_alat}}</td>
+                                    <td>- Rp {{hasil.biaya_hemat }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {%endfor%}
+                {% else %}
+                    <div class="rec-device">
+                        <h3>Tidak ada rekomendasi</h3>
+                    </div>
+                {% endif %}
     
-            <div class="rec-device">
+            <!-- <div class="rec-device">
                 <h3>AC</h3>
                 <ul>
                     <li>-8 jam penggunaan 1 AC</li>
@@ -267,10 +313,11 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </div> -->
         </div>
+        <h4>Total Penghematan: Rp {{total_penghematan}}</h4>
+        {%endif%}
 
-        <h4>Total Penghematan: Rp 0</h4>
     </div>
     
 
