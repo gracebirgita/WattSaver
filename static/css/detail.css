@@ -18,7 +18,8 @@
     --main-background: #FFFFF6;
     --btn-yellow: #FFE18D;
     --light-green: #D2E6E4;
-    
+    --btn-light-green: #0F776D;
+
     --gradient-color-1: #E9E9D3;
     --gradient-color-2: #E1E1CE;
     --gradient-color-3: #CFCFBE;
@@ -187,6 +188,15 @@ header{
     position: absolute;
     left: 8rem;
     top: 10.8rem;
+
+    background-color: var(--btn-light-green);
+    border-radius: 10px;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+#btn-back:hover{
+    background-color: black;
 }
 
 #header-container h2{

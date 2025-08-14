@@ -18,6 +18,7 @@
     --main-background: #FFFFF6;
     --btn-yellow: #FFE18D;
     --light-green: #D2E6E4;
+    --btn-light-green: #0F776D;
     
     --gradient-color-1: #E9E9D3;
     --gradient-color-2: #E1E1CE;
@@ -179,6 +180,7 @@ header{
     background-color: black;
     box-shadow: 1.5px 2px 2px rgb(180, 182, 180);
 }
+
 
 .navbar .btn-green{
     border-radius: 6px;
@@ -385,6 +387,14 @@ input:focus{
     padding-top: 11px;
     padding-bottom: 11px;
     box-shadow: 1.5px 2px 2px rgb(180, 182, 180)
+}
+
+#analisis-btn, #target-btn{
+    background-color: var(--btn-light-green);
+}
+#analisis-btn:hover,
+#target-btn:hover{
+    background-color: black;
 }
 
 /* filter dropdown */
