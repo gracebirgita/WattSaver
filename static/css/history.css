@@ -19,6 +19,7 @@
     --main-background: #FFFFF6;
     --btn-yellow: #FFE18D;
     --light-green: #D2E6E4;
+    --btn-light-green: #0F776D;
     
     --gradient-color-1: #E9E9D3;
     --gradient-color-2: #E1E1CE;
@@ -159,6 +160,19 @@ header{
     min-width: 36px;
 }
 .btn-green:hover{
+    transform: scale(1.05);
+    color: white;
+    background-color: black;
+    box-shadow: 1.5px 2px 2px rgb(180, 182, 180);
+}
+#lihat-detail{
+    padding: 0.6rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    border-radius: 10px;
+    background-color: var(--btn-light-green);
+}
+#lihat-detail:hover{
     transform: scale(1.05);
     color: white;
     background-color: black;
