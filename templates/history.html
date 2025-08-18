@@ -63,57 +63,37 @@
 
     <!-- Detail riwayat -->
     <h3 id="detail-riwayat">Detail Riwayat</h3>
-
+    {% set nama_bulan = [
+    '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ] %}
+    {% for rumah in rumah_list %}
     <div class="history-card">
-        <h3 class="month">Juni</h3>
+        <h3 class="month">{{ nama_bulan[rumah[1]|int] }} {{ rumah[2] }}</h3>
         <div class="row">
             <div class="col">
                 <p>Target Pengeluaran Bulanan(Rp)</p>
-                <p class="amount">Rp 5.200.000</p>
+                <p class="amount">Rp {{ "{:,}".format(rumah[3]) }}</p>
             </div>
             <div class="col">
                 <p>Kategori (berdasarkan target)</p>
-                <p class="category-boros"><strong>Boros</strong></p>
+                {% if rumah[5] == '2' %}
+                    <p class="category-boros"><strong>Boros</strong></p>
+                {% elif rumah[5] == '0' %}
+                    <p class="category-hemat"><strong>Hemat</strong></p>
+                {% else %}
+                    <p class="category-normal"><strong>Normal</strong></p>
+                {% endif %}
             </div>
             <div class="button-group">
-                <a class="btn-green" id="lihat-detail" href="{{ url_for('detail', from_page='history')}}" data-page="history">Lihat Detail</a>
+                <a class="btn-green" id="lihat-detail"
+                href="{{ url_for('detail', rumah_id=rumah[0], from_page='history') }}"
+                data-page="history">Lihat Detail</a>
             </div>
         </div>
     </div>
-
-    <div class="history-card">
-        <h3 class="month">Juni</h3>
-        <div class="row">
-            <div class="col">
-                <p>Target Pengeluaran Bulanan(Rp)</p>
-                <p class="amount">Rp 3.000.000</p>
-            </div>
-            <div class="col">
-                <p>Kategori (berdasarkan target)</p>
-                <p class="category-hemat"><strong>Hemat</strong></p>
-            </div>
-            <div class="button-group">
-                <a class="btn-green" id="lihat-detail" href="{{ url_for('detail', from_page='history')}}" data-page="history">Lihat Detail</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="history-card">
-        <h3 class="month">Juni</h3>
-        <div class="row">
-            <div class="col">
-                <p>Target Pengeluaran Bulanan(Rp)</p>
-                <p class="amount">Rp 3.500.000</p>
-            </div>
-            <div class="col">
-                <p>Kategori (berdasarkan target)</p>
-                <p class="category-normal"><strong>Normal</strong></p>
-            </div>
-            <div class="button-group">
-                <a class="btn-green" id="lihat-detail" href="{{ url_for('detail', from_page='history')}}" data-page="history">Lihat Detail</a>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
+    
 
     <!-- footer -->
     <div style="height: 10rem;"></div>

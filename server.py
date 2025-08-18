@@ -259,7 +259,7 @@ def check_alat_table(status):
     cur = conn.cursor()
     cur.execute(f"SELECT * FROM {table_name}")
     rows = cur.fetchall()
-
+    conn.close()
     for row in rows:
         print(row)
 
@@ -919,9 +919,90 @@ def edit():
     devices = get_table_devices(user_id)
     return render_template('edit.html', devices=devices)
 
+@app.route('/update_device', methods=['POST'])
+def update_device():
+    print("masuk update_device")
+    print(request.method)
+    print(request.form)
+    total_str = request.form.get('total')
+    if total_str is None:
+        # Tidak ada field total, kemungkinan request dari form lain (misal: delete)
+        return redirect(url_for('edit'))
+    conn = get_db()
+    try:
+        cursor = conn.cursor()
+        total = int(total_str)
+        for i in range(1, total+1):
+            alat_id = request.form.get(f'alat_id_{i}')
+            nama = request.form.get(f'nama_{i}')
+            jumlah = request.form.get(f'jumlah_{i}')
+            kepentingan = request.form.get(f'kepentingan_{i}')
+            watt = request.form.get(f'watt_{i}')
+            jam = request.form.get(f'jam_{i}')
+            if "AT" in alat_id:
+                cursor.execute("""
+                    UPDATE Alat_tinggi
+                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?
+                    WHERE alat_id=?
+                """, (nama, jumlah, kepentingan, watt, jam, alat_id))
+            elif "AS" in alat_id:
+                cursor.execute("""
+                    UPDATE Alat_sedang
+                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?
+                    WHERE alat_id=?
+                """, (nama, jumlah, kepentingan, watt, jam, alat_id))
+            elif "AR" in alat_id:
+                cursor.execute("""
+                    UPDATE Alat_rendah
+                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?
+                    WHERE alat_id=?
+                """, (nama, jumlah, kepentingan, watt, jam, alat_id))
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect(url_for('analisis'))
+
+@app.route('/delete_device', methods=['POST'])
+def delete_device():
+    print("alat_id yang bakal dipake:", request.form.get('alat_id'))
+    alat_id = request.form.get('alat_id')
+    conn = get_db()
+    try:
+        cursor = conn.cursor()
+        if "AT" in alat_id:
+            cursor.execute("""
+                DELETE FROM Alat_tinggi
+                WHERE alat_id=?
+            """, (alat_id,))
+        elif "AS" in alat_id:
+            cursor.execute("""
+                DELETE FROM Alat_sedang
+                WHERE alat_id=?
+            """, (alat_id,))
+        elif "AR" in alat_id:
+            cursor.execute("""
+                DELETE FROM Alat_rendah
+                WHERE alat_id=?
+            """, (alat_id,))
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect(url_for('edit'))
+
 @app.route('/history.html')
 def history():
-    return render_template('history.html')
+    user_id = session.get('user_id')
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+                    SELECT rumah_id, bulan, tahun, target_pemakaian, biaya_tagihan, label
+                    FROM Rumah
+                    WHERE user_id=?
+                    ORDER BY tahun DESC, bulan DESC
+                """, (user_id,))
+    rumah_list = cur.fetchall()
+    conn.close()
+    return render_template('history.html', rumah_list=rumah_list)
 
 @app.route('/detail', methods=['GET'])
 def detail():
