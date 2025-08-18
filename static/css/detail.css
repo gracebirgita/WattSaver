@@ -494,9 +494,12 @@ input:focus{
 }
 /* CHART */
 #visualisasi-biaya #status-chart{
-    max-width: 100%;
+    max-width: 350px;
+    max-height: 350px;
     height: auto;
     margin-bottom: 2rem;
+    margin-left: 2rem;
+    margin: 0 auto;
 }
 
 /* CHART */

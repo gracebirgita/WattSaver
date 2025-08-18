@@ -1006,9 +1006,79 @@ def history():
 
 @app.route('/detail', methods=['GET'])
 def detail():
+    rumah_id = request.args.get('rumah_id')
     from_page = request.args.get('from_page', '')
     print(f"nav dari : {from_page}")
-    return render_template('detail.html')
+
+    #ambil data rumah dari DB
+    conn = get_db()
+    curr = conn.cursor()
+    curr.execute("""
+        SELECT rumah_id, user_id, target_pemakaian, daya_va, 
+               kWh_tinggi, total_tinggi, 
+               kWh_sedang, total_sedang, 
+               kWh_rendah, total_rendah, 
+               pemakaian_kWh, biaya_tagihan, 
+               bulan, tahun, label
+        FROM Rumah WHERE rumah_id=?
+    """, (rumah_id,))
+    rumah = curr.fetchone()
+
+    # Ambil data perangkat untuk rumah ini
+    devices = []
+    kepentingan_dict = {1: "Rendah", 2: "Sedang", 3: "Tinggi"}
+    for table_name, status in [
+        ("Alat_rendah", "Rendah"),
+        ("Alat_sedang", "Sedang"),
+        ("Alat_tinggi", "Tinggi")
+    ]:
+        curr.execute(f"""
+            SELECT nama_alat, jumlah_alat, total_biaya, tingkat_kepentingan, watt, waktu_penggunaan
+            FROM {table_name}
+            WHERE rumah_id=?
+        """, (rumah_id,))
+        rows = curr.fetchall()
+        for row in rows:
+            nama_alat = row[0]
+            jml_alat = row[1]
+            biaya_tagihan = int(float(row[2]))
+            kepentingan = kepentingan_dict[row[3]]
+            watt = float(row[4])
+            waktu_penggunaan = float(row[5])
+            total_kWh = float(jml_alat) * float(watt/1000) * float(waktu_penggunaan)
+            devices.append({
+                'nama': nama_alat,
+                'jumlah': jml_alat,
+                'total_kWh': round(total_kWh,2),
+                'total_biaya': biaya_tagihan,
+                'kepentingan': kepentingan,
+                'status' : status,
+                'watt':watt,
+                'waktu_penggunaan': waktu_penggunaan,
+            })
+    conn.close()
+    # Ambil data analisis dari rumah
+    listrik_perbulan = rumah[10]  # pemakaian_kWh
+    biaya_tagihan = rumah[11]     # biaya_tagihan
+    target_pemakaian = rumah[2]   # target_pemakaian
+    label_map = {0: "Hemat", 1: "Normal", 2: "Boros"}
+    label_target = label_map.get(rumah[14], "Tidak diketahui")
+    status_count = {"Rendah": 0, "Sedang": 0, "Tinggi": 0}
+    for device in devices:
+        status_count[device['status']] += 1
+
+    # Kirim data ke template detail.html
+    return render_template(
+        'detail.html',
+        rumah=rumah,
+        devices=devices,
+        logged_in=('username' in session),
+        listrik_perbulan=listrik_perbulan,
+        biaya_tagihan=biaya_tagihan,
+        target_pemakaian=target_pemakaian,
+        label_target=label_target,
+        status_count=status_count
+    )
 
 if __name__ == "__main__":
     # serve(app, host= "0.0.0.0", port=8000)

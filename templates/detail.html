@@ -40,7 +40,10 @@
     <!-- Back button -->
     <div id="header-container">
         <a class="btn-green" id="btn-back" href="{{ url_for('history')}}" data-page="history">&#8592; Kembali</a>
-        <h2>Juni</h2>
+        <h2>{{ rumah[1]|int and [
+            '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ][rumah[0]|int] }} {{ rumah[1] }}</h2>
     </div>
 
     <!-- table devices -->
@@ -72,30 +75,16 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for device in devices %}
                     <tr>
-                        <th scope="row">kulkas</th>
-                        <td>2</td>
-                        <td>8</td>
-                        <td>12.789</td>
-                        <td>Tinggi</td>
-                        <td>Rendah</td>
+                        <th scope="row">{{ device.nama }}</th>
+                        <td>{{ device.jumlah }}</td>
+                        <td>{{ device.total_kWh }}</td>
+                        <td>{{ device.total_biaya }}</td>
+                        <td>{{ device.kepentingan }}</td>
+                        <td>{{ device.status }}</td>
                     </tr>
-                    <tr>
-                        <th scope="row">kulkas</th>
-                        <td>2</td>
-                        <td>8</td>
-                        <td>12.789</td>
-                        <td>Tinggi</td>
-                        <td>Rendah</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">kulkas</th>
-                        <td>2</td>
-                        <td>8</td>
-                        <td>12.789</td>
-                        <td>Tinggi</td>
-                        <td>Rendah</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -107,15 +96,15 @@
         <div id="result-container">
             <div class="analyze-result" id="konsumsi-listrik">
                 <label>Konsumsi Per Bulan</label>
-                <h3>40000.00 kWh</h3>
+                <h3>{{ listrik_perbulan }} kWh</h3>
             </div>
             <div class="analyze-result" id="biaya">
                 <label>Estimasi Biaya</label>
-                <h3>Rp 7.000.000</h3>
+                <h3>Rp {{ biaya_tagihan|int|format }}</h3>
             </div>
             <div class="analyze-result" id="prediction">
-                <label>Target: 5.200.000</label>
-                <h3 id="predict-category">Hemat</h3>
+                <label>Target: Rp {{ target_pemakaian|int|format }}</label>
+                <h3 id="predict-category">{{ label_target }}</h3>
             </div>
         </div>
         
@@ -128,69 +117,56 @@
     <!-- REKOMENDASI -->
     <div id='recommendation' class="container-box">
         <h3>Rekomendasi</h3>
-
-        <div id="rec-container">
-            <!-- make grid 2 col -->
-            <div class="rec-device">
-                <h3>AC</h3>
+        {% if rekomendasi_optimasi =="not" %}
+            <h5>Pengeluaran listrik Anda [Rp {{biaya_tagihan}}] aman dibawah target [Rp {{target_pemakaian}}].
+                Pertahankan kebiasaan untuk tagihan yang lebih ringan di akhir periode.
+            </h5>
+            <h6>
+                Tips :
                 <ul>
-                    <li>-8 jam penggunaan 1 AC</li>
-                    <li>-4 jam penggunaan 2 AC</li>
+                    <li>Matikan lampu jika tidak digunakan...</li>
+                    <li>Cabut charger laptop, ponsel, dan peralatan lain jika sudah tidak digunakan.</li>
+                    <li>Hindari menggunakan peralatan berdaya besar pada jam beban puncak</li>
                 </ul>
-            
-                <table id="recommend" class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">- Jam</th>
-                            <th scope="col">Jumlah</th>
-                            <th scope="col">Biaya dihemat</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                    </tbody>
-                </table>
+            </h6>
+            <div class="center-image">
+                <img src="{{url_for('static', filename='assets/house-nobg.png')}}" alt="green-item" width="800rem" style="margin: 3rem; opacity: 0.5;">
             </div>
-
-            <div class="rec-device">
-                <h3>AC</h3>
-                <ul>
-                    <li>-8 jam penggunaan 1 AC</li>
-                    <li>-4 jam penggunaan 2 AC</li>
-                </ul>
-            
-                <table id="recommend" class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">- Jam</th>
-                            <th scope="col">Jumlah</th>
-                            <th scope="col">Biaya dihemat</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                    </tbody>
-                </table>
+        {% else %}
+            <div id="rec-container">
+            {% if rekomendasi_optimasi %}
+                {% for hasil in rekomendasi_optimasi %}            
+                <div class="rec-device">
+                    <h3>{{hasil.nama}}</h3>
+                    <ul>
+                        <li>-{{hasil.pengurangan_jam}} jam penggunaan {{hasil.jumlah_alat}} {{hasil.nama}}</li>
+                    </ul>
+                    <table id="recommend" class="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">- Jam/hari</th>
+                            <th scope="col">Jumlah Alat</th>
+                            <th scope="col">Biaya Dihemat(Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">{{hasil.pengurangan_jam }}</th>
+                                <td>{{hasil.jumlah_alat}}</td>
+                                <td>- Rp {{hasil.biaya_hemat }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {%endfor%}
+            {% else %}
+                <div class="rec-device">
+                    <h3>Tidak ada rekomendasi</h3>
+                </div>
+            {% endif %}
             </div>
-        </div>
+            <h4>Total Penghematan: Rp {{total_penghematan}}</h4>
+        {%endif%}
     </div>
 
 
@@ -219,5 +195,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="{{ url_for('static', filename='scripts/detail.js')}}"></script>
+    <script>
+        // Data dari backend Flask (pastikan status_count dikirim dari backend)
+        const statusCount = {{ status_count | tojson }};
+        const data = {
+            labels: Object.keys(statusCount),
+            datasets: [{
+                label: 'Jumlah Perangkat',
+                data: Object.values(statusCount),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',   // Rendah
+                    'rgba(255, 206, 86, 0.7)',   // Sedang
+                    'rgba(54, 162, 235, 0.7)'    // Tinggi
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const ctx = document.getElementById('status-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
