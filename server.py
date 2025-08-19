@@ -8,6 +8,12 @@ import time
 import joblib
 import numpy as np
 from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpStatus
+from dotenv import load_dotenv
+import os
+
+load_dotenv("enviro.env")
+database_domain = os.getenv('database')
+API_KEY = os.getenv('auth_token')
 
 
 app = Flask(__name__)
@@ -15,6 +21,10 @@ app.secret_key = 'secret-key'
 
 def get_db():
     # koneksi turso
+    # conn = libsql.connect(
+    #     database=database_domain,
+    #     auth_token=API_KEY
+    # )
     conn = sqlite3.connect('WattSaverDB-newest.db')
     return conn
 
