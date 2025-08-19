@@ -13,13 +13,8 @@ from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpStatus
 app = Flask(__name__)
 app.secret_key = 'secret-key'
 
-# turso db shell libsql://wattsaver-shiroewt.aws-ap-northeast-1.turso.io  eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTM5Nzg0NjYsImlkIjoiY2FmOTgzZDQtZTkyZS00MTlkLTgzMjgtYTBhM2UxZTc3ZGRmIiwicmlkIjoiNjhiNGMyODgtZjBhMi00MzYwLTg0MTctNDAzNjE3YmE0YjkyIn0.I0cd3UsLdvC9w8zy7HFONwH9UEqSGZidTE-Sp8z1fFsEWOrkW-CO63qeDZJpc8i5DcoiVPEGrcmrl2puVGvmDg
 def get_db():
     # koneksi turso
-    # conn = libsql.connect(
-    #     database="libsql://wattsaver-shiroewt.aws-ap-northeast-1.turso.io",
-    #     auth_token="eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTM5Nzg0NjYsImlkIjoiY2FmOTgzZDQtZTkyZS00MTlkLTgzMjgtYTBhM2UxZTc3ZGRmIiwicmlkIjoiNjhiNGMyODgtZjBhMi00MzYwLTg0MTctNDAzNjE3YmE0YjkyIn0.I0cd3UsLdvC9w8zy7HFONwH9UEqSGZidTE-Sp8z1fFsEWOrkW-CO63qeDZJpc8i5DcoiVPEGrcmrl2puVGvmDg"
-    # )
     conn = sqlite3.connect('WattSaverDB-newest.db')
     return conn
 
