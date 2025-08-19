@@ -386,7 +386,7 @@ def index():
 # logged in status
 @app.context_processor
 def inject_logged_in():
-    return dict(logged_in =('username' in session))
+    return dict(logged_in =('email' in session))
 
 # register
 @app.route('/register', methods=['POST', 'GET']) # get user data, post to db
@@ -404,8 +404,8 @@ def register():
         conn = get_db()
         cur = conn.cursor()
         
-        # check duplicate account
-        cur.execute('SELECT * FROM User WHERE user_name=?', (username,))
+        # check duplicate account 
+        cur.execute('SELECT * FROM User WHERE email=?', (email,))
         account_exist = cur.fetchone() # row from database
         if account_exist:
             conn.close()
@@ -427,18 +427,20 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method =='POST':
-        username = request.form['username']
+        # username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
 
         # connect db
         conn = get_db()
         cur = conn.cursor()
-        cur.execute('SELECT * FROM User WHERE user_name=? AND password=?', (username, password))
+        cur.execute('SELECT * FROM User WHERE email=? AND password=?', (email, password))
         user = cur.fetchone()
         conn.close()
 
         if user:
-            session['username']= username
+            # session['username']= username
+            session['email'] = email
             session['user_id'] = user[0] # index kolom ke 0
             print("set session userid : ", session['user_id'])
 
