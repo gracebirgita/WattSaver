@@ -21,11 +21,11 @@ app.secret_key = 'secret-key'
 
 def get_db():
     # koneksi turso
-    # conn = libsql.connect(
-    #     database=database_domain,
-    #     auth_token=API_KEY
-    # )
-    conn = sqlite3.connect('WattSaverDB-newest.db')
+    conn = libsql.connect(
+        database=database_domain,
+        auth_token=API_KEY
+    )
+    # conn = sqlite3.connect('WattSaverDB-newest.db')
     return conn
 
 # generate rumah_id
@@ -457,6 +457,7 @@ def login():
 def logout():
     session.pop('username', None)
     session.pop('user_id', None)
+    session.pop('email', None)
     return redirect(url_for('index'))
 
 
@@ -840,14 +841,14 @@ def recommend_device_usage():
 
     # Fungsi tujuan: Meminimalkan biaya bulanan
     model_opt += lpSum([
-        ((device['watt'] * device['jml_alat'] * jam_vars[device['id']]) / 1000) * 30 * biaya_per_kwh
-        for device in devices_list if device['id'] in jam_vars
+        ((device['watt'] * device['jml_alat'] * jam_vars[device['alat_id']]) / 1000) * 30 * biaya_per_kwh
+        for device in devices_list if device['alat_id'] in jam_vars
     ]), "total_cost_monthly"
 
     # Constraint: Total cost <= target
     model_opt += lpSum([
-        ((device['watt'] * device['jml_alat'] * jam_vars[device['id']]) / 1000) * 30 * biaya_per_kwh
-        for device in devices_list if device['id'] in jam_vars
+        ((device['watt'] * device['jml_alat'] * jam_vars[device['alat_id']]) / 1000) * 30 * biaya_per_kwh
+        for device in devices_list if device['alat_id'] in jam_vars
     ]) <= target_pemakaian, "budget_constraint"
 
     # Solve optimization
@@ -856,7 +857,7 @@ def recommend_device_usage():
     hasil_optimasi = []
     if model_opt.status == 1:  # Optimal
         for device in devices_list:
-            device_id = device['id']
+            device_id = device['alat_id']
             if device_id not in jam_vars:
                 continue
 
@@ -878,7 +879,6 @@ def recommend_device_usage():
         print(f"Optimasi gagal. Status: {LpStatus[model_opt.status]}")
 
     return hasil_optimasi
-
 
 
 
