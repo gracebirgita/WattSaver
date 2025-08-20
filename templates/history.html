@@ -34,6 +34,13 @@
         <script src="{{ url_for('static', filename='scripts/navbar.js')}}"></script>
     </header>
 
+    <script>
+        // Ambil data dari rumah_list untuk chart
+        const rumahList = {{ rumah_list |reverse|list|tojson }};
+        // Ambil nama bulan dari Jinja
+        const namaBulan = {{ nama_bulan | tojson }};
+    </script>
+
     <section id="hero-section">
         <h1>History</h1>
         <h4>History Chart pengeluaran bulan sebelumnya vs TARGET</h4>
@@ -51,13 +58,23 @@
     <!-- Rangkuman penghematan -->
     <div id="summary">
         <h2>Rangkuman Penghematan</h2>
+        {% set nama_bulan = [
+        '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ] %}
         <div class="summary-item">
             <span class="label">Total Penghematan</span>
-            <span class="value">850.000</span>
+            <span class="value">Rp {{ "{:,}".format(total_penghematan|int) }}</span>
         </div>
         <div class="summary-item">
             <span class="label">Bulan paling hemat</span>
-            <span class="value">May 2025</span>
+            <span class="value">
+                {% if paling_hemat %}
+                    {{ nama_bulan[paling_hemat[1]|int] }} {{ paling_hemat[2] }}
+                {% else %}
+                    -
+                {% endif %}
+            </span>
         </div>
     </div>
 

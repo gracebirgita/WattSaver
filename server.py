@@ -1009,7 +1009,20 @@ def history():
                 """, (user_id,))
     rumah_list = cur.fetchall()
     conn.close()
-    return render_template('history.html', rumah_list=rumah_list)
+    nama_bulan = [
+        '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ]
+    total_target = sum(rumah[3] for rumah in rumah_list)
+    total_pengeluaran = sum(rumah[4] for rumah in rumah_list)
+    total_penghematan = total_target - total_pengeluaran
+    daftar_hemat = []
+    for rumah in rumah_list:
+        target = rumah[3]
+        pengeluaran = rumah[4]
+        daftar_hemat.append(target-pengeluaran)
+    paling_hemat = min(daftar_hemat) if daftar_hemat else 0
+    return render_template('history.html', rumah_list=rumah_list, nama_bulan=nama_bulan, total_penghematan=total_penghematan, daftar_hemat=daftar_hemat, paling_hemat=paling_hemat)
 
 @app.route('/detail', methods=['GET'])
 def detail():

@@ -2,6 +2,9 @@ const options={
             animation: true,
             maintainAspectRation: true
         }
+        const labels = rumahList.map(rumah => namaBulan[parseInt(rumah[1])] + ' ' + rumah[2]);
+        const pengeluaranAktual = rumahList.map(rumah => rumah[4]);
+        const target = rumahList.map(rumah => rumah[3]);
                 
         const data={
             labels:['Rendah', 'Sedang', 'Tinggi'],
@@ -18,26 +21,28 @@ const options={
             }]
         }
 
-        const dataHist={
-            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-            datasets:[{
-                    // pengeluaran aktual(dari akumulasi devices)
+        const dataHist = {
+            labels: labels,
+            datasets: [
+                {
                     label: 'Pengeluaran aktual',
-                    data:[2000000, 4000000, 2300000,3500000],
+                    data: pengeluaranAktual,
                     borderColor: '#FFE18D',
                     borderWidth: 2,
-                    fill: false
+                    fill: false,
+                    tension: 0.3
                 },
                 {
                     label: 'Target',
-                    data:[1500000, 3000000, 2200000,3200000],
+                    data: target,
                     borderColor: 'green',
                     borderWidth: 2,
                     borderDash: [5,5],
-                    fill:false
+                    fill: false,
+                    tension: 0.3
                 }
             ]
-        }
+        };
         let chart2 = document.getElementById('history-chart').getContext('2d');
 
         let historyChart = new Chart(chart2,{
