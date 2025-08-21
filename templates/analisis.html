@@ -277,45 +277,25 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                </div>
                 {%endfor%}
+                <h4>Total Penghematan: Rp {{total_penghematan}}</h4>
+
                 {% else %}
-                    <div class="rec-device">
-                        <h3>Tidak ada rekomendasi</h3>
-                    </div>
+                <div id="no-rec" style="display: block;">
+                    <h5>Tidak ada rekomendasi spesifik, target anda tidak realistis dengan penggunaan alat-alat elektronik anda saat ini, kami sarankan untuk menaikkan target atau mengurangi alat-alat elektronik anda</h3>
+                        <h6>
+                            Tips :
+                            <ul>
+                                <li>Matikan lampu jika tidak digunakan: jadikan kebiasaan untuk selalu mematikan lampu setiap kali meninggalkan ruangan</li>
+                                <li>Cabut charger laptop, ponsel, dan peralatan lain jika sudah tidak digunakan.</li>
+                                <li>Hindari menggunakan peralatan berdaya besar (seperti setrika, pompa air, atau water heater) pada jam beban puncak</li>
+                            </ul>
+                        </h6>
+                </div>
                 {% endif %}
-    
-            <!-- <div class="rec-device">
-                <h3>AC</h3>
-                <ul>
-                    <li>-8 jam penggunaan 1 AC</li>
-                    <li>-4 jam penggunaan 2 AC</li>
-                </ul>
-            
-                <table id="recommend" class="table">
-                    <thead>
-                        <tr>
-                        <th scope="col">- Jam</th>
-                        <th scope="col">Jumlah</th>
-                        <th scope="col">Biaya dihemat</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">8</th>
-                            <td>1</td>
-                            <td>- Rp.7.000</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div> -->
-        </div>
-        <h4>Total Penghematan: Rp {{total_penghematan}}</h4>
+            </div>
+        
         {%endif%}
 
     </div>

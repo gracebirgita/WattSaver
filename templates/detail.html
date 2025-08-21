@@ -40,11 +40,7 @@
     <!-- Back button -->
     <div id="header-container">
         <a class="btn-green" id="btn-back" href="{{ url_for('history')}}" data-page="history">&#8592; Kembali</a>
-<<<<<<< Updated upstream
         <h2>{{ rumah[12]|int and [
-=======
-        <h2>{{ rumah[13]|int and [
->>>>>>> Stashed changes
             '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
         ][rumah[12]|int] }} {{ rumah[13] }}</h2>
@@ -163,13 +159,23 @@
                     </table>
                 </div>
                 {%endfor%}
-            {% else %}
-                <div class="rec-device">
-                    <h3>Tidak ada rekomendasi</h3>
-                </div>
-            {% endif %}
-            </div>
             <h4>Total Penghematan: Rp {{total_penghematan}}</h4>
+
+
+                {% else %}
+                    <div id="no-rec" style="display: block;">
+                        <h5>Tidak ada rekomendasi spesifik, target anda tidak realistis dengan penggunaan alat-alat elektronik anda saat ini, kami sarankan untuk menaikkan target atau mengurangi alat-alat elektronik anda</h3>
+                            <h6>
+                                Tips :
+                                <ul>
+                                    <li>Matikan lampu jika tidak digunakan: jadikan kebiasaan untuk selalu mematikan lampu setiap kali meninggalkan ruangan</li>
+                                    <li>Cabut charger laptop, ponsel, dan peralatan lain jika sudah tidak digunakan.</li>
+                                    <li>Hindari menggunakan peralatan berdaya besar (seperti setrika, pompa air, atau water heater) pada jam beban puncak</li>
+                                </ul>
+                            </h6>
+                    </div>
+                {% endif %}
+            </div>
         {%endif%}
     </div>
 

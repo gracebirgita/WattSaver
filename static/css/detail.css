@@ -564,8 +564,17 @@ input:focus{
     margin-top: 0;
 }
 
-
-
+/* #not-found-recommend h5{
+    font-size: 18px;
+    font-weight: 600;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 0;
+} */
+#no-rec{
+    width: 100%;
+    grid-column: 1/-1; /*seluruh grid*/
+}
 
 /* /////////////////// */
 /* section footer */

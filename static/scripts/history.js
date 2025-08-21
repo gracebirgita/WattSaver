@@ -1,3 +1,25 @@
+// history label
+const predictLabel = document.querySelectorAll('.category-label');
+
+predictLabel.forEach(label =>{
+    const strongElement = label.querySelector('strong')
+    if (!strongElement) return;
+    const textLabel = strongElement.textContent.toLowerCase().trim()
+    console.log(textLabel)
+
+    if(textLabel==='boros'){
+        strongElement.style.color='red';
+    }
+    else if(textLabel==='normal'){
+        strongElement.style.color = '#BA8C09';
+    }
+    else if(textLabel==='hemat'){
+        strongElement.style.color ='#265853';
+    }
+})
+
+
+
 const options={
             animation: true,
             maintainAspectRation: true
