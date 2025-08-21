@@ -10,6 +10,8 @@ import numpy as np
 from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpStatus
 from dotenv import load_dotenv
 import os
+import time
+import random
 
 load_dotenv("enviro.env")
 database_domain = os.getenv('database')
@@ -73,23 +75,60 @@ def check_rumahid_intime(user_id):
         print(f'rumah_id for {user_id} : {data_rumah} at {bulan}/{tahun}')
     else:
         print(f'rumah_id for {user_id} not found..')
-        rumah_id = generate_rumahID(conn)
-
-        # user belum pernah insert data di bulan&tahun tsb
-        cur.execute("""INSERT INTO Rumah
-                    (rumah_id, user_id, 
-                    target_pemakaian, daya_va, 
-                    kWh_tinggi, total_tinggi,
-                    kWh_sedang,total_sedang,
-                    kWh_rendah, total_rendah,
-                    pemakaian_kWh, biaya_tagihan,
-                    bulan, tahun,
-                    label
-                    ) VALUES (?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ?, ?, 0)""", 
-                    (rumah_id, user_id, bulan, tahun))
+        # Cari rumah terakhir milik user
+        cur.execute("SELECT * FROM Rumah WHERE user_id=? ORDER BY tahun DESC, bulan DESC LIMIT 1", (user_id,))
+        last_rumah = cur.fetchone()
+        print(f'last rumah_id for {user_id} : {last_rumah}')
+        rumah_id_baru = generate_rumahID(conn)
+        if last_rumah:
+            # Copy data dari rumah lama ke rumah baru, update bulan & tahun
+            cur.execute("""
+                INSERT INTO Rumah (
+                    rumah_id, user_id, daya_va, 
+                    kWh_tinggi, total_tinggi, 
+                    kWh_sedang, total_sedang, 
+                    kWh_rendah, total_rendah, 
+                    pemakaian_kWh, biaya_tagihan, 
+                    bulan, tahun, label, target_pemakaian
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                rumah_id_baru, user_id,
+                last_rumah[2], last_rumah[3], last_rumah[4], last_rumah[5],
+                last_rumah[6], last_rumah[7], last_rumah[8], last_rumah[9],
+                last_rumah[10],
+                bulan, tahun, last_rumah[13], last_rumah[14]
+            ))
+            # Copy semua alat dari rumah lama ke rumah baru
+            for table_name in ["Alat_tinggi", "Alat_sedang", "Alat_rendah"]:
+                cur.execute(f"SELECT * FROM {table_name} WHERE rumah_id=?", (last_rumah[0],))
+                alat_rows = cur.fetchall()
+                print(alat_rows[0])
+                for alat in alat_rows:
+                    # Buat alat_id baru
+                    alat_id_baru = generate_alatID(conn, alat[3])
+                    # Asumsi kolom: alat_id, nama_alat, rumah_id, watt, jumlah_alat, waktu_penggunaan, total_biaya, tingkat_kepentingan
+                    cur.execute(f"""
+                        INSERT INTO {table_name} (
+                            alat_id, rumah_id, watt, jumlah_alat, waktu_penggunaan, total_biaya, nama_alat, tingkat_kepentingan
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        alat_id_baru, rumah_id_baru, alat[2], alat[3], alat[4], alat[5], alat[6], alat[7]
+                    ))
+        else:
+            # User belum pernah punya rumah, buat baru kosong
+            cur.execute("""INSERT INTO Rumah
+                        (rumah_id, user_id, 
+                        target_pemakaian, daya_va, 
+                        kWh_tinggi, total_tinggi,
+                        kWh_sedang,total_sedang,
+                        kWh_rendah, total_rendah,
+                        pemakaian_kWh, biaya_tagihan,
+                        bulan, tahun,
+                        label
+                        ) VALUES (?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ?, ?, 0)""", 
+                        (generate_rumahID(conn), user_id, bulan, tahun))
     conn.commit()
     conn.close()
-    # check data update
     check_rumah_table()
 
 
@@ -110,17 +149,11 @@ def generate_alatID(conn, watt):
         print("tingkat kepentingan out-of-range")
         return None
     
-    cur = conn.cursor()
-    cur.execute(f'SELECT alat_id FROM {table_name} ORDER BY alat_id DESC LIMIT 1')
-    last_id = cur.fetchone()
+    # Gunakan waktu dan random agar unik
+    unique_part = f"{int(time.time()*1000)}{random.randint(100,999)}"
+    alat_id_baru = f"{prefix}{unique_part}"
 
-    if last_id:
-        last_num = int(last_id[0][2:]) # R
-        new_row = last_num+1
-    else:
-        new_row=1
-
-    return f"{prefix}{new_row:03d}"
+    return alat_id_baru
 
 
 def get_rumah_id():
@@ -160,7 +193,7 @@ def get_jumlah_alat(watt, nama_alat):
     return jumlah
 
 def get_status_count():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     conn=get_db()
     cur = conn.cursor()
     total_count={}
@@ -205,6 +238,105 @@ def check_target_filled():
 
     return True
 
+def recommend_device_usage_by_rumah(rumah_id):
+    # Ambil data perangkat untuk rumah_id tertentu
+    conn = get_db()
+    cur = conn.cursor()
+    devices_list = []
+    kepentingan_dict = {1: "Rendah", 2: "Sedang", 3: "Tinggi"}
+    min_usage_pct = {'Rendah': 0.2, 'Sedang': 0.4, 'Tinggi': 0.7}
+
+    for table_name, status in [
+        ("Alat_rendah", "Rendah"),
+        ("Alat_sedang", "Sedang"),
+        ("Alat_tinggi", "Tinggi")
+    ]:
+        cur.execute(f"""
+            SELECT nama_alat, jumlah_alat, total_biaya, tingkat_kepentingan, watt, waktu_penggunaan, alat_id
+            FROM {table_name}
+            WHERE rumah_id=?
+        """, (rumah_id,))
+        rows = cur.fetchall()
+        for row in rows:
+            nama_alat = row[0]
+            jml_alat = row[1]
+            biaya_tagihan = int(float(row[2]))
+            kepentingan = row[3]
+            watt = float(row[4])
+            waktu_penggunaan = float(row[5])
+            total_kWh = float(jml_alat) * float(watt/1000) * float(waktu_penggunaan)
+            kepentingan_str = kepentingan_dict[kepentingan]
+            min_usage = min_usage_pct[kepentingan_str]
+            alat_id = row[6]
+            devices_list.append({
+                'nama': nama_alat,
+                'jumlah': jml_alat,
+                'total_kWh': round(total_kWh,2),
+                'total_biaya': biaya_tagihan,
+                'kepentingan': kepentingan_str,
+                'status' : status,
+                'watt':watt,
+                'jml_alat': jml_alat,
+                'min_usage': min_usage,
+                'waktu_penggunaan': waktu_penggunaan,
+                'alat_id' : alat_id,
+            })
+    # Ambil data rumah
+    cur.execute("SELECT daya_va, target_pemakaian, biaya_tagihan FROM Rumah WHERE rumah_id=?", (rumah_id,))
+    rumah_row = cur.fetchone()
+    conn.close()
+    if not rumah_row:
+        return []
+    daya_va, target_pemakaian, biaya_tagihan_now = rumah_row
+
+    tarif_listrik = {
+        900: 1352,
+        1300: 1444.7,
+        2200: 1444.7,
+        3500: 1699.53
+    }
+    biaya_per_kwh = tarif_listrik.get(daya_va, 1352)
+    if biaya_tagihan_now < target_pemakaian:
+        return "not"
+
+    # Optimasi
+    model_opt = LpProblem("optimasi_penggunaan_listrik", LpMinimize)
+    jam_vars = {}
+    for device in devices_list:
+        device_id = device['alat_id']
+        min_jam = device['waktu_penggunaan'] * device['min_usage']
+        max_jam = device['waktu_penggunaan']
+        jam_vars[device_id] = LpVariable(f"Jam_{device_id}", lowBound=min_jam, upBound=max_jam)
+    if not jam_vars:
+        return []
+    model_opt += lpSum([
+        ((device['watt'] * device['jml_alat'] * jam_vars[device['alat_id']]) / 1000) * 30 * biaya_per_kwh
+        for device in devices_list if device['alat_id'] in jam_vars
+    ]), "total_cost_monthly"
+    model_opt += lpSum([
+        ((device['watt'] * device['jml_alat'] * jam_vars[device['alat_id']]) / 1000) * 30 * biaya_per_kwh
+        for device in devices_list if device['alat_id'] in jam_vars
+    ]) <= target_pemakaian, "budget_constraint"
+    model_opt.solve()
+    hasil_optimasi = []
+    if model_opt.status == 1:
+        for device in devices_list:
+            device_id = device['alat_id']
+            if device_id not in jam_vars:
+                continue
+            jam_optimal = jam_vars[device_id].value()
+            jam_awal = device['waktu_penggunaan']
+            pengurangan_jam = jam_awal - jam_optimal
+            penghematan_kwh = ((device['watt'] * device['jml_alat'] * pengurangan_jam) / 1000) * 30
+            penghematan_biaya = penghematan_kwh * biaya_per_kwh
+            hasil_optimasi.append({
+                'nama': device['nama'],
+                'pengurangan_jam': pengurangan_jam,
+                'jumlah_alat': device['jml_alat'],
+                'biaya_hemat': rupiah_format(penghematan_biaya),
+            })
+    return hasil_optimasi
+
 
 ### main function in page ###
 
@@ -212,6 +344,7 @@ def check_target_filled():
 @app.route('/get_month_target', methods=['POST'])
 def get_month_target():
     user_id = session.get('user_id')
+    rumah_id_terbaru = get_latest_rumah_id(user_id)
     print("USER ID -month target= ", user_id)
     if request.method=='POST':
         target_expense = request.form.get('target-expense')
@@ -228,7 +361,7 @@ def get_month_target():
 
         conn= get_db()
         cur= conn.cursor()
-        cur.execute("UPDATE Rumah SET target_pemakaian=?, daya_va=? WHERE user_id=?", (target_expense, tarif_group, user_id))
+        cur.execute("UPDATE Rumah SET target_pemakaian=?, daya_va=? WHERE rumah_id=?", (target_expense, tarif_group, rumah_id_terbaru))
         conn.commit()
         conn.close()
 
@@ -272,7 +405,7 @@ def check_alat_table(status):
 def get_daya_group():
     conn = get_db()
     cur = conn.cursor()
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
 
     cur.execute("SELECT daya_va FROM Rumah WHERE rumah_id=?", (rumah_id,))
     daya_va = cur.fetchone()
@@ -286,7 +419,7 @@ def get_daya_group():
 
 # update pemakaian_kwh Rumah
 def update_pemakaian_kwh():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     conn = get_db()
     cur = conn.cursor()
 
@@ -323,7 +456,7 @@ def update_pemakaian_kwh():
 # 2. add new device
 @app.route('/add_new_device', methods=['POST'])
 def add_new_device():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     name = request.form.get('device-name')
     amount = request.form.get('device-jml')
     important = request.form.get('device-kepentingan')
@@ -561,13 +694,26 @@ def logout():
     
 #     conn.commit()
 #     conn.close()
-
+def get_latest_rumah_id(user_id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT rumah_id FROM Rumah
+        WHERE user_id=?
+        ORDER BY tahun DESC, bulan DESC
+        LIMIT 1
+    """, (user_id,))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else None
 
 # 3. GET data tabel live
 def get_table_devices(user_id):
     conn = get_db()
     cur = conn.cursor()
     devices=[]
+
+    rumah_id = get_latest_rumah_id(user_id)
 
     # kepentingan
     kepentingan_dict={
@@ -584,14 +730,10 @@ def get_table_devices(user_id):
         ("Alat_tinggi", "Tinggi")
     ]:
         cur.execute(f"""
-            SELECT  nama_alat, jumlah_alat, 
-                    total_biaya,tingkat_kepentingan, 
-                    watt, waktu_penggunaan, alat_id
+            SELECT nama_alat, jumlah_alat, total_biaya, tingkat_kepentingan, watt, waktu_penggunaan, alat_id
             FROM {table_name}
-            WHERE rumah_id IN(
-                SELECT rumah_id FROM Rumah WHERE user_id=?
-            )
-            """, (user_id,))
+            WHERE rumah_id=?
+        """, (rumah_id,))
         
         rows = cur.fetchall()
 
@@ -637,7 +779,7 @@ def get_table_devices(user_id):
     return devices
 
 def check_total_kwh():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT pemakaian_kWh FROM Rumah WHERE rumah_id=?", (rumah_id,))
@@ -649,7 +791,7 @@ def check_total_kwh():
     return tot_konsumsi
 
 def check_biaya_tagihan():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT biaya_tagihan FROM Rumah WHERE rumah_id=?", (rumah_id,))
@@ -662,7 +804,7 @@ def check_biaya_tagihan():
 
 # select target biaya listrik
 def check_target_pemakaian():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT target_pemakaian FROM Rumah WHERE rumah_id=?", (rumah_id,))
@@ -678,7 +820,7 @@ def rupiah_format(amount):
 
 # 1. get feature input for model
 def get_feature_data():
-    rumah_id=get_rumah_id()
+    rumah_id=get_latest_rumah_id(session.get('user_id'))
     conn = get_db()
     cur = conn.cursor()
 
@@ -759,7 +901,7 @@ def update_predict_label(prediction, rumah_id):
     conn.close()
 
 def get_label_prediction():
-    rumah_id = get_rumah_id()
+    rumah_id = get_latest_rumah_id(session.get('user_id'))
     
     data_feature = get_feature_data()
     if not data_feature or len(data_feature) !=9:
@@ -876,7 +1018,7 @@ def recommend_device_usage():
             print(f"Device: {device['nama']}, Optimal Usage: {jam_optimal} hours/day")
     else:
         print(f"Optimasi gagal. Status: {LpStatus[model_opt.status]}")
-
+    print("Hasil optimasi:", hasil_optimasi)
     return hasil_optimasi
 
 
@@ -1015,13 +1157,14 @@ def history():
     total_target = sum(rumah[3] for rumah in rumah_list)
     total_pengeluaran = sum(rumah[4] for rumah in rumah_list)
     total_penghematan = total_target - total_pengeluaran
-    daftar_hemat = []
+    paling_hemat_rumah = None
+    paling_hemat_nilai = None
     for rumah in rumah_list:
-        target = rumah[3]
-        pengeluaran = rumah[4]
-        daftar_hemat.append(target-pengeluaran)
-    paling_hemat = min(daftar_hemat) if daftar_hemat else 0
-    return render_template('history.html', rumah_list=rumah_list, nama_bulan=nama_bulan, total_penghematan=total_penghematan, daftar_hemat=daftar_hemat, paling_hemat=paling_hemat)
+        selisih = rumah[3] - rumah[4]
+        if (paling_hemat_nilai is None) or (selisih > paling_hemat_nilai):
+            paling_hemat_nilai = selisih
+            paling_hemat_rumah = rumah
+    return render_template('history.html', rumah_list=rumah_list, nama_bulan=nama_bulan, total_penghematan=total_penghematan, paling_hemat_rumah=paling_hemat_rumah)
 
 @app.route('/detail', methods=['GET'])
 def detail():
@@ -1085,7 +1228,17 @@ def detail():
     status_count = {"Rendah": 0, "Sedang": 0, "Tinggi": 0}
     for device in devices:
         status_count[device['status']] += 1
+<<<<<<< Updated upstream
     rekomendasi_optimasi = recommend_device_usage()
+=======
+    rekomendasi_optimasi = recommend_device_usage_by_rumah(rumah_id)
+    total_penghematan = 0
+    if isinstance(rekomendasi_optimasi, list):
+        total_penghematan = sum(
+            float(hasil['biaya_hemat'].replace('Rp', '').replace(',', '').replace('.', '').strip())
+            for hasil in rekomendasi_optimasi if 'biaya_hemat' in hasil
+        )
+>>>>>>> Stashed changes
     # Kirim data ke template detail.html
     return render_template(
         'detail.html',
@@ -1096,7 +1249,12 @@ def detail():
         target_pemakaian=target_pemakaian,
         label_target=label_target,
         status_count=status_count,
+<<<<<<< Updated upstream
         rekomendasi_optimasi=rekomendasi_optimasi
+=======
+        rekomendasi_optimasi=rekomendasi_optimasi,
+        total_penghematan=total_penghematan
+>>>>>>> Stashed changes
     )
 
 if __name__ == "__main__":
