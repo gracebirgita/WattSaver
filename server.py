@@ -455,8 +455,9 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
+    # session.pop('username', None)
     session.pop('user_id', None)
+    session.pop('email', None) 
     return redirect(url_for('index'))
 
 
@@ -840,14 +841,13 @@ def recommend_device_usage():
 
     # Fungsi tujuan: Meminimalkan biaya bulanan
     model_opt += lpSum([
-        ((device['watt'] * device['jml_alat'] * jam_vars[device['id']]) / 1000) * 30 * biaya_per_kwh
-        for device in devices_list if device['id'] in jam_vars
+        ((device['watt'] * device['jml_alat'] * jam_vars[device['alat_id']]) / 1000) * 30 * biaya_per_kwh
+        for device in devices_list if device['alat_id'] in jam_vars
     ]), "total_cost_monthly"
 
-    # Constraint: Total cost <= target
     model_opt += lpSum([
-        ((device['watt'] * device['jml_alat'] * jam_vars[device['id']]) / 1000) * 30 * biaya_per_kwh
-        for device in devices_list if device['id'] in jam_vars
+        ((device['watt'] * device['jml_alat'] * jam_vars[device['alat_id']]) / 1000) * 30 * biaya_per_kwh
+        for device in devices_list if device['alat_id'] in jam_vars
     ]) <= target_pemakaian, "budget_constraint"
 
     # Solve optimization
@@ -856,7 +856,7 @@ def recommend_device_usage():
     hasil_optimasi = []
     if model_opt.status == 1:  # Optimal
         for device in devices_list:
-            device_id = device['id']
+            device_id = device['alat_id']
             if device_id not in jam_vars:
                 continue
 
@@ -1086,18 +1086,18 @@ def detail():
     status_count = {"Rendah": 0, "Sedang": 0, "Tinggi": 0}
     for device in devices:
         status_count[device['status']] += 1
-
+    rekomendasi_optimasi = recommend_device_usage()
     # Kirim data ke template detail.html
     return render_template(
         'detail.html',
         rumah=rumah,
         devices=devices,
-        logged_in=('username' in session),
         listrik_perbulan=listrik_perbulan,
         biaya_tagihan=biaya_tagihan,
         target_pemakaian=target_pemakaian,
         label_target=label_target,
-        status_count=status_count
+        status_count=status_count,
+        rekomendasi_optimasi=rekomendasi_optimasi
     )
 
 if __name__ == "__main__":
