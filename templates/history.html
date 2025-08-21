@@ -53,7 +53,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script src="{{ url_for('static', filename='scripts/history.js')}}"></script>
+    
 
     <!-- Rangkuman penghematan -->
     <div id="summary">
@@ -94,13 +94,17 @@
             </div>
             <div class="col">
                 <p>Kategori (berdasarkan target)</p>
-                {% if rumah[5] == '2' %}
-                    <p class="category-boros"><strong>Boros</strong></p>
-                {% elif rumah[5] == '0' %}
-                    <p class="category-hemat"><strong>Hemat</strong></p>
+                {% if rumah[5] == 2 %}
+                    <p class="category-label"><strong>Boros</strong></p>
+                {% elif rumah[5] == 0 %}
+                    <p class="category-label"><strong>Hemat</strong></p>
                 {% else %}
-                    <p class="category-normal"><strong>Normal</strong></p>
+                    <p class="category-label"><strong>Normal</strong></p>
                 {% endif %}
+                <!-- {% set label_map = {0: "Hemat", 1: "Normal", 2: "Boros"} %}
+                {% for rumah in rumah_list %}
+                    <p class="category-label"><strong>{{label_map[rumah[5]]}}</strong></p>
+                {%endfor%} -->
             </div>
             <div class="button-group">
                 <a class="btn-green" id="lihat-detail"
@@ -135,6 +139,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <!-- chartjs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
+    <script src="{{ url_for('static', filename='scripts/history.js')}}"></script>
 </body>
 </html>

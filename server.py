@@ -244,7 +244,7 @@ def recommend_device_usage_by_rumah(rumah_id):
     cur = conn.cursor()
     devices_list = []
     kepentingan_dict = {1: "Rendah", 2: "Sedang", 3: "Tinggi"}
-    min_usage_pct = {'Rendah': 0.2, 'Sedang': 0.4, 'Tinggi': 0.7}
+    min_usage_pct = {'Rendah': 0.1, 'Sedang': 0.2, 'Tinggi': 0.5}
 
     for table_name, status in [
         ("Alat_rendah", "Rendah"),
@@ -288,6 +288,8 @@ def recommend_device_usage_by_rumah(rumah_id):
     if not rumah_row:
         return []
     daya_va, target_pemakaian, biaya_tagihan_now = rumah_row
+    print('tagihan by rumah: ', biaya_tagihan)
+    print('target by rumah: ', target_pemakaian)
 
     tarif_listrik = {
         900: 1352,
@@ -296,7 +298,9 @@ def recommend_device_usage_by_rumah(rumah_id):
         3500: 1699.53
     }
     biaya_per_kwh = tarif_listrik.get(daya_va, 1352)
-    if biaya_tagihan_now < target_pemakaian:
+
+    if float(biaya_tagihan_now) < float(target_pemakaian):
+        print(biaya_tagihan, ' < ', target_pemakaian)
         return "not"
 
     # Optimasi
@@ -722,7 +726,7 @@ def get_table_devices(user_id):
         3:"Tinggi"
     }
 
-    min_usage_pct = {'Rendah': 0.2, 'Sedang': 0.4, 'Tinggi': 0.7}
+    min_usage_pct = {'Rendah': 0.1, 'Sedang': 0.2, 'Tinggi': 0.5}
     # status
     for table_name, status in [
         ("Alat_rendah", "Rendah"),
@@ -948,11 +952,14 @@ def recommend_device_usage():
         return []
     
     # target biaya user
-    target_pemakaian = check_target_pemakaian()
+    target_pemakaian = float(check_target_pemakaian())
+    print("target rekomend",target_pemakaian)
     # biaya bulan sblmnya(real)
-    biaya_tagihan_now = check_biaya_tagihan()
+    biaya_tagihan_now = float(check_biaya_tagihan())*30
+    print("tagihan now rekomend",biaya_tagihan_now)
 
     if biaya_tagihan_now < target_pemakaian:
+        print('tagihan < target (hemat) -> not')
         return "not"
 
     tarif_listrik = {
@@ -992,11 +999,24 @@ def recommend_device_usage():
         for device in devices_list if device['alat_id'] in jam_vars
     ]) <= target_pemakaian, "budget_constraint"
 
+    # biaya_aktual = sum(
+    #     ((device['watt'] * device['jml_alat'] * device['waktu_penggunaan']) / 1000) * 30 * biaya_per_kwh
+    #     for device in devices_list
+    # )
+    # print("Biaya aktual (tagihan rekomendasi):", biaya_aktual)
+    
+    # total_biaya_min = sum(
+    # ((device['watt'] * device['jml_alat'] * device['waktu_penggunaan'] * device['min_usage']) / 1000) * 30 * biaya_per_kwh
+    # for device in devices_list
+    # )
+    # print("Total biaya minimum yang bisa dicapai:", total_biaya_min)
+    # print("Target pemakaian:", target_pemakaian)
+
     # Solve optimization
     model_opt.solve()
 
     hasil_optimasi = []
-    if model_opt.status == 1:  # Optimal
+    if model_opt.status == 1:  # Optimal/feasible
         for device in devices_list:
             device_id = device['alat_id']
             if device_id not in jam_vars:
@@ -1022,10 +1042,10 @@ def recommend_device_usage():
     return hasil_optimasi
 
 
-
 @app.route('/analisis.html', methods=['GET'])
 def analisis():
     devices = get_table_devices(session.get('user_id')) # get table-device
+    rumah_id = get_rumah_id()
     target_set = check_target_filled() # set target
     listrik_perbulan = check_total_kwh()
     biaya_tagihan = check_biaya_tagihan()
@@ -1049,8 +1069,8 @@ def analisis():
     return render_template("analisis.html", 
                            devices=devices, 
                            target_set=target_set,
-                           listrik_perbulan=listrik_perbulan,
-                           biaya_tagihan=rupiah_format(biaya_tagihan),
+                           listrik_perbulan=float(listrik_perbulan)*30,
+                           biaya_tagihan=rupiah_format(float(biaya_tagihan)*30),
                            target_pemakaian = rupiah_format(target_pemakaian),
                            label_target = label_target,
                            rekomendasi_optimasi=rekomendasi_optimasi,
@@ -1140,6 +1160,8 @@ def delete_device():
 @app.route('/history.html')
 def history():
     user_id = session.get('user_id')
+
+    label_map = {0: "Hemat", 1: "Normal", 2: "Boros"}
     conn = get_db()
     cur = conn.cursor()
     cur.execute("""
@@ -1164,11 +1186,14 @@ def history():
         if (paling_hemat_nilai is None) or (selisih > paling_hemat_nilai):
             paling_hemat_nilai = selisih
             paling_hemat_rumah = rumah
+
     return render_template('history.html', rumah_list=rumah_list, nama_bulan=nama_bulan, total_penghematan=total_penghematan, paling_hemat_rumah=paling_hemat_rumah)
+
 
 @app.route('/detail', methods=['GET'])
 def detail():
     rumah_id = request.args.get('rumah_id')
+    print('rumah_id detail: ', rumah_id)
     from_page = request.args.get('from_page', '')
     print(f"nav dari : {from_page}")
 
@@ -1223,22 +1248,14 @@ def detail():
     listrik_perbulan = rumah[10]  # pemakaian_kWh
     biaya_tagihan = rumah[11]     # biaya_tagihan
     target_pemakaian = rumah[2]   # target_pemakaian
+
     label_map = {0: "Hemat", 1: "Normal", 2: "Boros"}
     label_target = label_map.get(rumah[14], "Tidak diketahui")
     status_count = {"Rendah": 0, "Sedang": 0, "Tinggi": 0}
     for device in devices:
         status_count[device['status']] += 1
-<<<<<<< Updated upstream
-    rekomendasi_optimasi = recommend_device_usage()
-=======
+    # rekomendasi_optimasi = recommend_device_usage()
     rekomendasi_optimasi = recommend_device_usage_by_rumah(rumah_id)
-    total_penghematan = 0
-    if isinstance(rekomendasi_optimasi, list):
-        total_penghematan = sum(
-            float(hasil['biaya_hemat'].replace('Rp', '').replace(',', '').replace('.', '').strip())
-            for hasil in rekomendasi_optimasi if 'biaya_hemat' in hasil
-        )
->>>>>>> Stashed changes
     # Kirim data ke template detail.html
     return render_template(
         'detail.html',
@@ -1249,12 +1266,7 @@ def detail():
         target_pemakaian=target_pemakaian,
         label_target=label_target,
         status_count=status_count,
-<<<<<<< Updated upstream
         rekomendasi_optimasi=rekomendasi_optimasi
-=======
-        rekomendasi_optimasi=rekomendasi_optimasi,
-        total_penghematan=total_penghematan
->>>>>>> Stashed changes
     )
 
 if __name__ == "__main__":

@@ -565,6 +565,10 @@ input:focus{
     padding-left: 25px;
 }
 
+#no-rec{
+    width: 100%;
+    grid-column: 1/-1; /*seluruh grid*/
+}
 
 
 /* /////////////////// */
