@@ -21,11 +21,11 @@ app.secret_key = 'secret-key'
 
 def get_db():
     # koneksi turso
-    # conn = libsql.connect(
-    #     database=database_domain,
-    #     auth_token=API_KEY
-    # )
-    conn = sqlite3.connect('WattSaverDB-newest.db')
+    conn = libsql.connect(
+        database=database_domain,
+        auth_token=API_KEY
+    )
+    # conn = sqlite3.connect('WattSaverDB-newest.db')
     return conn
 
 # generate rumah_id
@@ -457,7 +457,7 @@ def login():
 def logout():
     # session.pop('username', None)
     session.pop('user_id', None)
-    session.pop('email', None) 
+    session.pop('email', None)
     return redirect(url_for('index'))
 
 
@@ -878,7 +878,6 @@ def recommend_device_usage():
         print(f"Optimasi gagal. Status: {LpStatus[model_opt.status]}")
 
     return hasil_optimasi
-
 
 
 
