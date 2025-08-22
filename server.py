@@ -24,11 +24,11 @@ app.secret_key = 'secret-key'
 
 def get_db():
     # koneksi turso
-    # conn = libsql.connect(
-    #     database=database_domain,
-    #     auth_token=API_KEY
-    # )
-    conn = sqlite3.connect('WattSaverDB-newest.db')
+    conn = libsql.connect(
+        database=database_domain,
+        auth_token=API_KEY
+    )
+    # conn = sqlite3.connect('WattSaverDB-newest.db')
     return conn
 
 # generate rumah_id
