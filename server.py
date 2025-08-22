@@ -13,7 +13,9 @@ import os
 import time
 import random
 
-load_dotenv("enviro.env")
+# load_dotenv("enviro.env")
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
 database_domain = os.getenv('database')
 API_KEY = os.getenv('auth_token')
 
