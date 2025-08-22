@@ -18,8 +18,6 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 database_domain = os.getenv('database')
 API_KEY = os.getenv('auth_token')
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
@@ -1275,8 +1273,8 @@ def detail():
         rekomendasi_optimasi=rekomendasi_optimasi
     )
 
-# if __name__ == "__main__":
-#     port = int(os.environ.get("PORT", 5000))  # ambil port dari Railway
-#     app.run(host="0.0.0.0", port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # ambil port dari Railway
+    app.run(host="0.0.0.0", port=port)
     # serve(app, host= "0.0.0.0", port=8000)
     # app.run(debug=True)
