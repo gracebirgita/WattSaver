@@ -16,7 +16,6 @@ import random
 load_dotenv("enviro.env")
 database_domain = os.getenv('database')
 API_KEY = os.getenv('auth_token')
-print("Loaded DB URL:", database_domain)
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
