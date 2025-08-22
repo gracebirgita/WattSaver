@@ -18,6 +18,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 database_domain = os.getenv('database')
 API_KEY = os.getenv('auth_token')
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
