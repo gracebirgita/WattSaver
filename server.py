@@ -22,6 +22,9 @@ API_KEY = os.getenv('auth_token')
 app = Flask(__name__)
 app.secret_key = 'secret-key'
 
+# Debug print saat modul di-import (akan jalan meskipun via gunicorn)
+print(">>> Railway PORT (saat import):", os.environ.get("PORT"))
+
 def get_db():
     # koneksi turso
     conn = libsql.connect(
