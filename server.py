@@ -1115,24 +1115,41 @@ def update_device():
             kepentingan = request.form.get(f'kepentingan_{i}')
             watt = request.form.get(f'watt_{i}')
             jam = request.form.get(f'jam_{i}')
+
+            daya_va = get_daya_group()
+            tarif_listrik = {
+                900: 1352,
+                1300: 1444.7,
+                2200: 1444.7,
+                3500: 1699.53
+            }
+
+            biaya_per_kwh = tarif_listrik[daya_va]
+            total_biaya = ((float(watt)/1000) *float(jam)) *float(biaya_per_kwh) *float(jumlah)
+            print("jumlah diupdate device : ", jumlah, "nama: ", nama, "watt: ", watt)
+
             if "AT" in alat_id:
                 cursor.execute("""
                     UPDATE Alat_tinggi
-                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?
+                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?, total_biaya=?
                     WHERE alat_id=?
-                """, (nama, jumlah, kepentingan, watt, jam, alat_id))
+                """, (nama, jumlah, kepentingan, watt, jam, total_biaya,alat_id))
+
             elif "AS" in alat_id:
                 cursor.execute("""
                     UPDATE Alat_sedang
-                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?
+                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?, total_biaya=?
                     WHERE alat_id=?
-                """, (nama, jumlah, kepentingan, watt, jam, alat_id))
+                """, (nama, jumlah, kepentingan, watt, jam, total_biaya, alat_id))
+
             elif "AR" in alat_id:
                 cursor.execute("""
                     UPDATE Alat_rendah
-                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?
+                    SET nama_alat=?, jumlah_alat=?, tingkat_kepentingan=?, watt=?, waktu_penggunaan=?, total_biaya=?
                     WHERE alat_id=?
-                """, (nama, jumlah, kepentingan, watt, jam, alat_id))
+                """, (nama, jumlah, kepentingan, watt, jam,total_biaya,alat_id))
+
+            print("nama: ",nama,"jumlah diupdate device : ", jumlah, "kepentingan: ", kepentingan, "watt: ", watt, "jam: ", jam, "alat_id: ", alat_id, "total biaya: ", total_biaya)
         conn.commit()
     finally:
         conn.close()
