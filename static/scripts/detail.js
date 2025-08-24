@@ -44,11 +44,26 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
 
+        // const statusCounts = {{ status_counts|tojson }};
+// const total = statusCounts.total_rendah + statusCounts.total_sedang + statusCounts.total_tinggi;
+// const dataPersen = [
+//     total ? Math.round(statusCounts.total_rendah / total * 100) : 0,
+//     total ? Math.round(statusCounts.total_sedang / total * 100) : 0,
+//     total ? Math.round(statusCounts.total_tinggi / total * 100) : 0
+// ];
+const total = statusCounts["Rendah"] + statusCounts["Sedang"] + statusCounts["Tinggi"];
+const dataPersen = [
+    total ? Math.round(statusCounts["Rendah"] / total * 100) : 0,
+    total ? Math.round(statusCounts["Sedang"] / total * 100) : 0,
+    total ? Math.round(statusCounts["Tinggi"] / total * 100) : 0
+];
+
+console.log("data persen : ",dataPersen);
+
     const data={
-        labels:['Rendah', 'Sedang', 'Tinggi'],
+        labels: Object.keys(statusCounts),
         datasets:[{
-            data: [200, 300, 500],
-            // data: dataPersen,
+            data: dataPersen,
                 // data: [{}],
             label: 'persentase',
             backgroundColor: [

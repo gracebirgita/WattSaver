@@ -100,10 +100,10 @@
             </div>
             <div class="analyze-result" id="biaya">
                 <label>Estimasi Biaya</label>
-                <h3>Rp {{ biaya_tagihan|int|format }}</h3>
+                <h3>Rp {{ biaya_tagihan }}</h3>
             </div>
             <div class="analyze-result" id="prediction">
-                <label>Target: Rp {{ target_pemakaian|int|format }}</label>
+                <label>Target: Rp {{ target_pemakaian }}</label>
                 <h3 id="predict-category">{{ label_target }}</h3>
             </div>
         </div>
@@ -204,35 +204,12 @@
     <!-- chartjs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script src="{{ url_for('static', filename='scripts/detail.js')}}"></script>
+    
     <script>
         // Data dari backend Flask (pastikan status_count dikirim dari backend)
-        const statusCount = {{ status_count | tojson }};
-        const data = {
-            labels: Object.keys(statusCount),
-            datasets: [{
-                label: 'Jumlah Perangkat',
-                data: Object.values(statusCount),
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.7)',   // Rendah
-                    'rgba(255, 206, 86, 0.7)',   // Sedang
-                    'rgba(54, 162, 235, 0.7)'    // Tinggi
-                ],
-                borderWidth: 1
-            }]
-        };
-
-        const ctx = document.getElementById('status-chart').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: data,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
+        const statusCounts = {{ status_count | tojson }};
+        console.log(statusCounts)
     </script>
+    <script src="{{ url_for('static', filename='scripts/detail.js')}}"></script>
 </body>
 </html>

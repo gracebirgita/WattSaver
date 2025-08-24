@@ -13,7 +13,7 @@ import os
 import time
 import random
 
-# load_dotenv("enviro.env")
+load_dotenv("enviro.env")
 # load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 database_domain = os.getenv('database')
@@ -823,8 +823,11 @@ def check_target_pemakaian():
     return target_biaya
 
 def rupiah_format(amount):
-    return f"{amount:,.0f}".replace(",", ".")
-
+    try:
+        return f"{amount:,.0f}".replace(",", ".")
+    except:
+        print('rupiah format eror')
+        return str(amount)
 
 # 1. get feature input for model
 def get_feature_data():
@@ -1073,8 +1076,8 @@ def analisis():
     return render_template("analisis.html", 
                            devices=devices, 
                            target_set=target_set,
-                           listrik_perbulan=float(listrik_perbulan)*30,
-                           biaya_tagihan=rupiah_format(float(biaya_tagihan)*30),
+                           listrik_perbulan=round(listrik_perbulan,2),
+                           biaya_tagihan=rupiah_format(biaya_tagihan),
                            target_pemakaian = rupiah_format(target_pemakaian),
                            label_target = label_target,
                            rekomendasi_optimasi=rekomendasi_optimasi,
@@ -1253,6 +1256,7 @@ def detail():
     biaya_tagihan = rumah[11]     # biaya_tagihan
     target_pemakaian = rumah[2]   # target_pemakaian
 
+
     label_map = {0: "Hemat", 1: "Normal", 2: "Boros"}
     label_target = label_map.get(rumah[14], "Tidak diketahui")
     status_count = {"Rendah": 0, "Sedang": 0, "Tinggi": 0}
@@ -1265,9 +1269,9 @@ def detail():
         'detail.html',
         rumah=rumah,
         devices=devices,
-        listrik_perbulan=listrik_perbulan,
-        biaya_tagihan=biaya_tagihan,
-        target_pemakaian=target_pemakaian,
+        listrik_perbulan=round(listrik_perbulan,2),
+        biaya_tagihan=rupiah_format(int(biaya_tagihan)),
+        target_pemakaian=rupiah_format(int(target_pemakaian)),
         label_target=label_target,
         status_count=status_count,
         rekomendasi_optimasi=rekomendasi_optimasi

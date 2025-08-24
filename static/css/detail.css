@@ -503,11 +503,12 @@ input:focus{
 }
 
 /* CHART */
-/* 
+
 #visualisasi-biaya #status-chart{
-    width: 800px !important;
-    height: 200px !important;
-} */
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
+}
 
 
 /* /////////////////// */
