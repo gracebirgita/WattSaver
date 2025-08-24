@@ -1065,7 +1065,8 @@ def analisis():
 
     # label_prediction
     label_target = get_label_prediction()
-    rekomendasi_optimasi = recommend_device_usage()
+    # rekomendasi_optimasi = recommend_device_usage()
+    rekomendasi_optimasi = recommend_device_usage_by_rumah(rumah_id)
     total_penghematan = sum(
         float(hasil['biaya_hemat'].replace('Rp', '').replace(',', '').replace('.', '').strip())
         for hasil in rekomendasi_optimasi if 'biaya_hemat' in hasil
